@@ -391,6 +391,7 @@ body.place-mode #map { cursor: crosshair; }
   #mob-place-btn,
   #mob-search-btn-hdr,
   #mob-gps-fab,
+  #mob-pin-here-fab,
   #bottom-sheet {
     display: none !important;
   }
@@ -404,7 +405,8 @@ body.place-mode #map { cursor: crosshair; }
   #mob-search-btn-hdr {
     display: flex !important;
   }
-  #mob-gps-fab {
+  #mob-gps-fab,
+  #mob-pin-here-fab {
     display: flex !important;
   }
 }
@@ -1357,6 +1359,10 @@ body.place-mode .pin-head {
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="2"/><line x1="6.5" y1="1" x2="6.5" y2="3"/><line x1="6.5" y1="10" x2="6.5" y2="12"/><line x1="1" y1="6.5" x2="3" y2="6.5"/><line x1="10" y1="6.5" x2="12" y2="6.5"/></svg>
           GPS Tracking
         </button>
+        <button id="sb-pin-here-btn" onclick="dropPinAtGps()" style="height:34px;padding:0 12px;border-radius:8px;background:var(--green);border:none;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;font-family:inherit;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='var(--green-dk)'" onmouseout="this.style.background='var(--green)'">
+          <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="5" r="2.5"/><path d="M7 13.5C7 13.5 1.5 8.5 1.5 5C1.5 2.5 4 0.5 7 0.5S12.5 2.5 12.5 5C12.5 8.5 7 13.5 7 13.5Z"/></svg>
+          Pin Here
+        </button>
         <span id="sb-gps-status">Not tracking</span>
       </div>
     </div>
@@ -1439,8 +1445,11 @@ body.place-mode .pin-head {
 
     <!-- FAB group -->
     <div id="map-fab-group">
-      <button class="map-fab" id="mob-gps-fab" onclick="toggleGps()" title="GPS" style="display:none">
+      <button class="map-fab" id="mob-gps-fab" onclick="toggleGps()" title="Track GPS path" style="display:none">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="3"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="10" y1="16" x2="10" y2="19"/><line x1="1" y1="10" x2="4" y2="10"/><line x1="16" y1="10" x2="19" y2="10"/></svg>
+      </button>
+      <button class="map-fab" id="mob-pin-here-fab" onclick="dropPinAtGps()" title="Drop pin at my location" style="display:none">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3"/><path d="M10 19C10 19 3 12.5 3 7C3 3.7 6.1 1 10 1S17 3.7 17 7C17 12.5 10 19 10 19Z"/><line x1="10" y1="7" x2="10" y2="7" stroke-width="3" stroke-linecap="round"/></svg>
       </button>
     </div>
 
@@ -1524,6 +1533,10 @@ body.place-mode .pin-head {
                 <button onclick="bsSearch()" style="background:var(--blue);color:#fff;border-radius:8px;padding:0 16px;font-size:13px;font-weight:700;height:40px;white-space:nowrap;flex-shrink:0;">Go</button>
               </div>
             </div>
+            <button onclick="dropPinAtGps()" style="width:100%;height:48px;border-radius:10px;background:var(--green);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;border:none;font-family:inherit;cursor:pointer;transition:background 0.15s,transform 0.1s;" onmouseover="this.style.background='var(--green-dk)'" onmouseout="this.style.background='var(--green)'" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform=''">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="6" r="2.5"/><path d="M8 15C8 15 2.5 10 2.5 6C2.5 3.0 5.0 1 8 1S13.5 3.0 13.5 6C13.5 10 8 15 8 15Z"/></svg>
+              Drop Pin at My Location
+            </button>
             <div id="mob-gps-status-tools" style="font-size:12px;color:var(--text3);"></div>
             <div style="height:1px;background:var(--border);"></div>
             <button class="pdf-btn" onclick="generatePDF()">
@@ -1657,6 +1670,7 @@ let gpsDot = null;
 let gpsAccCircle = null;
 let gpsPolyline = null;
 let gpsHullPolygon = null;
+let lastGpsPos = null;
 
 // Bottom sheet
 const BS_PEEK = 100;
@@ -2082,6 +2096,7 @@ function stopGps() {
 }
 
 function onGpsPos(pos) {
+  lastGpsPos = pos;
   const { latitude: lat, longitude: lng, accuracy } = pos.coords;
   const latlng = L.latLng(lat, lng);
   if (!gpsDot) {
@@ -2101,6 +2116,21 @@ function onGpsPos(pos) {
 }
 
 function onGpsErr(err) { console.warn('GPS error', err); }
+
+function dropPinAtGps() {
+  if (!navigator.geolocation) { showToast('Geolocation not supported'); return; }
+  showToast('Getting your location…');
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      lastGpsPos = pos;
+      dropPin(pos.coords.latitude, pos.coords.longitude);
+      map.flyTo([pos.coords.latitude, pos.coords.longitude], Math.max(map.getZoom(), 18));
+      showToast('Pin dropped at your location');
+    },
+    (err) => { showToast('Could not get location — check permissions'); },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
+  );
+}
 
 function updateGpsPolyline() {
   if (gpsPolyline) map.removeLayer(gpsPolyline);
