@@ -305,7 +305,7 @@ body.high-contrast .leaflet-tile-pane { filter: none !important; }
 #map-fab-group {
   position: absolute;
   right: 14px;
-  bottom: 114px; /* fallback: peek (100) + 14px gap; overridden by JS on mobile */
+  bottom: 78px; /* fallback: peek (64) + 14px gap; overridden by JS on mobile */
   z-index: 500;
   display: flex;
   flex-direction: column;
@@ -2285,7 +2285,7 @@ let gpsHullPolygon = null;
 let lastGpsPos = null;
 
 // Bottom sheet
-const BS_PEEK = 100;
+const BS_PEEK = 64; // handle (20px) + tab bar (44px) — always visible
 let bsCurrentSnap = BS_PEEK;
 let bsDragStartY = 0;
 let bsDragStartH = 0;
@@ -2338,7 +2338,7 @@ function initMap() {
 
   map.on('click', (e) => {
     closeMobSearch();
-    if (isMobile) snapBottomSheet(0);
+    if (isMobile) snapBottomSheet(BS_PEEK);
     if (mode === 'place') {
       const now = Date.now();
       if (now - lastPlacedTime < 600) return;
@@ -2364,8 +2364,8 @@ function initMap() {
     // Upward swipe on map: expand bottom sheet
     if (isMobile && dy < -50 && Math.abs(dy) > Math.abs(dx) * 1.5) {
       const vh = bsMaxHeight();
-      const nextSnap = bsCurrentSnap < vh * 0.2 ? vh * 0.42
-                     : bsCurrentSnap < vh * 0.6  ? vh
+      const nextSnap = bsCurrentSnap <= BS_PEEK + 10 ? vh * 0.5
+                     : bsCurrentSnap < vh * 0.6    ? vh
                      : null;
       if (nextSnap) { snapBottomSheet(nextSnap); return; }
     }
@@ -2378,7 +2378,7 @@ function initMap() {
     const rect = mapEl.getBoundingClientRect();
     const latlng = map.containerPointToLatLng(L.point(t.clientX - rect.left, t.clientY - rect.top));
     dropPin(latlng.lat, latlng.lng);
-    if (isMobile) snapBottomSheet(0);
+    if (isMobile) snapBottomSheet(BS_PEEK);
   }, { passive: true });
 }
 
@@ -2621,7 +2621,7 @@ function esc(s) {
 
 function flyTo(lat, lng) {
   map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
-  if (isMobile) snapBottomSheet(0);
+  if (isMobile) snapBottomSheet(BS_PEEK);
 }
 
 // ============================================================
@@ -2840,20 +2840,20 @@ function initBottomSheet() {
   const dragZone = document.getElementById('bs-drag-zone');
   if (window.innerWidth < 640) {
     bs.style.display = 'flex';
-    snapBottomSheet(0); // start closed
+    snapBottomSheet(BS_PEEK);
   }
 
   dragZone.addEventListener('touchstart', (e) => {
     bsDragging = true;
     bsDragStartY = e.touches[0].clientY;
-    bsDragStartH = parseInt(bs.style.height) || 0;
+    bsDragStartH = parseInt(bs.style.height) || BS_PEEK;
     bs.style.transition = 'none';
   }, { passive: true });
 
   window.addEventListener('touchmove', (e) => {
     if (!bsDragging) return;
     const dy = bsDragStartY - e.touches[0].clientY;
-    const newH = Math.max(0, Math.min(bsMaxHeight(), bsDragStartH + dy));
+    const newH = Math.max(BS_PEEK, Math.min(bsMaxHeight(), bsDragStartH + dy));
     bs.style.height = newH + 'px';
     updateZoomControlPosition(newH);
   }, { passive: true });
@@ -2861,9 +2861,9 @@ function initBottomSheet() {
   window.addEventListener('touchend', () => {
     if (!bsDragging) return;
     bsDragging = false;
-    const curH = parseInt(bs.style.height) || 0;
+    const curH = parseInt(bs.style.height) || BS_PEEK;
     const vh = bsMaxHeight();
-    const snapPoints = [0, vh * 0.42, vh];
+    const snapPoints = [BS_PEEK, vh * 0.5, vh];
     const closest = snapPoints.reduce((a, b) => Math.abs(b - curH) < Math.abs(a - curH) ? b : a);
     snapBottomSheet(closest);
   });
@@ -2874,8 +2874,6 @@ function snapBottomSheet(h) {
   bs.style.transition = 'height 0.32s cubic-bezier(0.4, 0, 0.2, 1)';
   bs.style.height = h + 'px';
   bsCurrentSnap = h;
-  // Hide overflow so tab content doesn't peek when nearly closed
-  bs.style.overflow = h < 10 ? 'hidden' : 'hidden';
   updateZoomControlPosition(h);
 }
 
@@ -2901,7 +2899,7 @@ function switchBsTab(idx) {
   bsActiveTab = idx;
   document.querySelectorAll('.bs-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   document.querySelectorAll('.bs-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
-  if (bsCurrentSnap < bsMaxHeight() * 0.2) snapBottomSheet(bsMaxHeight() * 0.42);
+  if (bsCurrentSnap <= BS_PEEK + 10) snapBottomSheet(bsMaxHeight() * 0.5);
 }
 
 // ============================================================
