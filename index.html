@@ -767,6 +767,7 @@ textarea.field-input { resize: vertical; min-height: 72px; line-height: 1.5; }
 .mc-btn:hover { background: var(--surf3); }
 .mc-btn.del { color: var(--red); background: #fff4f4; border-color: #fde0e0; }
 .mc-btn.del:hover { background: #ffe8e8; }
+.mc-btn-icon { flex: 0 0 30px; padding: 0; }
 .mc-thumb {
   max-width: 72px;
   max-height: 54px;
@@ -1467,20 +1468,10 @@ body.place-mode .pin-head {
           </svg>
           <span id="mob-place-label">Place Pin</span>
         </button>
-        <button class="hdr-btn" onclick="saveSession()" title="Save">
-          <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13 15H4C3.4 15 3 14.6 3 14V3C3 2.4 3.4 2 4 2H11L14 5V14C14 13.6 13.6 14 13 14Z"/>
-            <rect x="6" y="10" width="5" height="5" rx="0.5"/>
-            <rect x="6" y="2" width="4" height="3" rx="0.5"/>
-          </svg>
-        </button>
-        <button class="hdr-btn" onclick="clearAll()" title="Clear All">
-          <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3,4 14,4"/>
-            <path d="M6 4V2.5H11V4"/>
-            <path d="M5 4L5.5 13.5C5.5 14.1 6 14.5 6.5 14.5H10.5C11 14.5 11.5 14.1 11.5 13.5L12 4"/>
-            <line x1="7" y1="7" x2="7" y2="12"/>
-            <line x1="10" y1="7" x2="10" y2="12"/>
+        <button class="hdr-btn" id="reset-btn" onclick="clearAll()" title="Reset survey">
+          <svg width="17" height="17" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1.5 9A7.5 7.5 0 1 0 4 3.5"/>
+            <polyline points="1,1 4,3.5 6.5,1"/>
           </svg>
         </button>
       </div>
@@ -2013,8 +2004,10 @@ const strings = {
     tour4_body_desktop: 'Expand Survey Info in the sidebar to add your name, the city, and the department you\'re writing to.',
     tour5_title: 'Generate your PDF report',
     tour5_body: 'When you\'re done, tap "Generate PDF Report" to download a formal ADA complaint letter in both English and Spanish, with your map, photos, and every location documented.',
-    tour6_title: 'Language & display settings',
-    tour6_body: 'Tap the Settings tab to switch languages, choose Light, Dark, or High Contrast mode, or report a bug.',
+    tour6_title: 'Reset your survey',
+    tour6_body: 'Use the reset button in the top-right to clear all markers, GPS data, and form fields and start a new survey.',
+    tour7_title: 'Language & display settings',
+    tour7_body: 'Tap the Settings tab to switch languages, choose Light, Dark, or High Contrast mode, or report a bug.',
     // Lang toggle
     lang_toggle: 'ES',
     // PDF
@@ -2171,8 +2164,10 @@ const strings = {
     tour4_body_desktop: 'Expande Información de la Inspección en la barra lateral para agregar tu nombre, la ciudad y el departamento al que escribes.',
     tour5_title: 'Genera tu informe PDF',
     tour5_body: 'Cuando termines, toca "Generar Informe PDF" para descargar una carta formal de queja en inglés y español, con tu mapa, fotos y cada ubicación documentada.',
-    tour6_title: 'Configuración de idioma y pantalla',
-    tour6_body: 'Toca la pestaña Ajustes para cambiar el idioma, elegir el modo Claro, Oscuro o de Alto Contraste, o reportar un error.',
+    tour6_title: 'Reinicia tu inspección',
+    tour6_body: 'Usa el botón de reinicio en la esquina superior derecha para borrar todos los marcadores, datos GPS y campos del formulario y comenzar una nueva inspección.',
+    tour7_title: 'Configuración de idioma y pantalla',
+    tour7_body: 'Toca la pestaña Ajustes para cambiar el idioma, elegir el modo Claro, Oscuro o de Alto Contraste, o reportar un error.',
     // Lang toggle
     lang_toggle: 'EN',
     // PDF
@@ -2596,7 +2591,9 @@ function resizeImage(dataUrl, maxSize, callback) {
     if (w > maxSize || h > maxSize) { const r = Math.min(maxSize/w, maxSize/h); w = Math.round(w*r); h = Math.round(h*r); }
     const c = document.createElement('canvas'); c.width = w; c.height = h;
     c.getContext('2d').drawImage(img, 0, 0, w, h);
-    callback(c.toDataURL('image/jpeg', 0.82));
+    // Prefer WebP for smaller file size; fall back to JPEG if unsupported
+    const webp = c.toDataURL('image/webp', 0.85);
+    callback(webp.startsWith('data:image/webp') ? webp : c.toDataURL('image/jpeg', 0.82));
   };
   img.src = dataUrl;
 }
@@ -2649,9 +2646,8 @@ function markerCardHTML(m, i) {
           <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="5.5" cy="5" r="2"/><path d="M5.5 11C5.5 11 2 7.5 2 5C2 2.8 3.6 1 5.5 1S9 2.8 9 5C9 7.5 5.5 11 5.5 11Z"/></svg>
           ${t('view')}
         </button>
-        <button class="mc-btn del" onclick="deleteMarker(${m.id})">
-          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="2,2.5 9,2.5"/><path d="M4 2.5V1.5H7V2.5"/><path d="M3.5 2.5L4 9.5H7L7.5 2.5"/></svg>
-          ${t('delete')}
+        <button class="mc-btn del mc-btn-icon" onclick="deleteMarker(${m.id})" title="${t('delete')}">
+          <svg width="13" height="13" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="2,2.5 9,2.5"/><path d="M4 2.5V1.5H7V2.5"/><path d="M3.5 2.5L4 9.5H7L7.5 2.5"/></svg>
         </button>
       </div>
     </div>
@@ -3264,6 +3260,13 @@ function getTourSteps() {
     {
       title: t('tour6_title'),
       body: t('tour6_body'),
+      target: () => document.getElementById('reset-btn'),
+      arrow: 'bottom',
+      pad: 8,
+    },
+    {
+      title: t('tour7_title'),
+      body: t('tour7_body'),
       target: () => isMobile ? document.querySelector('.bs-tab[data-tab="2"]') : null,
       arrow: 'top',
       pad: 8,
@@ -3414,7 +3417,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // FEEDBACK / GITHUB ISSUE
 // ============================================================
 const GITHUB_REPO = 'ekbrothers/curbcut-app';
-const GITHUB_TOKEN = ''; // set via setGithubToken() or provide at deploy time
+const GITHUB_TOKEN = typeof __GITHUB_TOKEN__ !== 'undefined' ? __GITHUB_TOKEN__ : '';
 
 let feedbackType = 'bug';
 
