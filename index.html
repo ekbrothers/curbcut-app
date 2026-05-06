@@ -1806,21 +1806,28 @@ body.place-mode .pin-head {
 <div id="onboard-welcome">
   <!-- Screen 1: What is this app -->
   <div id="onboard-welcome-card" id="onboard-card-1">
+    <!-- Language pill at top of welcome -->
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+      <div style="display:flex;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);">
+        <button id="ob-lang-en" onclick="setLang('en')" style="padding:5px 14px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:var(--navy);color:#fff;transition:background 0.15s;">EN</button>
+        <button id="ob-lang-es" onclick="setLang('es')" style="padding:5px 14px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:var(--surf2);color:var(--text2);transition:background 0.15s;">ES</button>
+      </div>
+    </div>
     <div id="onboard-welcome-icon">
       <svg width="26" height="26" viewBox="0 0 18 18" fill="none">
         <circle cx="9" cy="4" r="2.5" fill="white"/>
         <path d="M5 8.5C5 7.5 6 7 7 7.5L9 8.5L12.5 6.5C13.2 6.1 14 6.6 14 7.4V9.5L11 11.5V15C11 15.6 10.6 16 10 16H8C7.4 16 7 15.6 7 15V11L5 9.5V8.5Z" fill="white"/>
       </svg>
     </div>
-    <h2>Curb Cut — ADA Survey Tool</h2>
-    <p style="margin-bottom:12px">Curb cuts — the small ramps where sidewalks meet streets — are legally required under the Americans with Disabilities Act. When they're missing, broken, or too steep, people with mobility needs can be completely blocked from moving through their own neighborhood.</p>
-    <p>This tool helps you <strong>map problem locations</strong>, document them with photos, and <strong>generate a formal complaint letter</strong> addressed to your local public works department — so your findings can actually drive change.</p>
+    <h2 id="ob-title">Curb Cut — ADA Survey Tool</h2>
+    <p id="ob-p1" style="margin-bottom:12px">Curb cuts — the small ramps where sidewalks meet streets — are legally required under the Americans with Disabilities Act. When they're missing, broken, or too steep, people with mobility needs can be completely blocked from moving through their own neighborhood.</p>
+    <p id="ob-p2">This tool helps you <strong id="ob-p2-s1">map problem locations</strong>, document them with photos, and <strong id="ob-p2-s2">generate a formal complaint letter</strong> addressed to your local public works department — so your findings can actually drive change.</p>
     <div style="height:1px;background:var(--border);margin:20px 0"></div>
     <button id="onboard-welcome-start" onclick="showWelcomeScreen2()">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="6"/><polyline points="5.5,5 10,7.5 5.5,10"/></svg>
-      How does it work?
+      <span id="ob-how-btn">How does it work?</span>
     </button>
-    <button id="onboard-skip-welcome" onclick="dismissTour()">Skip — jump straight to the map</button>
+    <button id="onboard-skip-welcome" onclick="dismissTour()"><span id="ob-skip1-btn">Skip — jump straight to the map</span></button>
   </div>
 
   <!-- Screen 2: Show me how -->
@@ -1828,30 +1835,30 @@ body.place-mode .pin-head {
     <div style="width:52px;height:52px;border-radius:14px;background:var(--navy);display:flex;align-items:center;justify-content:center;margin-bottom:18px">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
     </div>
-    <h2 style="font-size:22px;font-weight:700;color:var(--text1);margin-bottom:10px;letter-spacing:-0.3px">Here's how it works</h2>
+    <h2 id="ob2-title" style="font-size:22px;font-weight:700;color:var(--text1);margin-bottom:10px;letter-spacing:-0.3px">Here's how it works</h2>
     <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
       <div style="display:flex;gap:12px;align-items:flex-start">
         <div style="width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">1</div>
-        <div style="font-size:13.5px;color:var(--text2);line-height:1.5"><strong style="color:var(--text1)">Search</strong> for your street or neighborhood to zoom the map there.</div>
+        <div style="font-size:13.5px;color:var(--text2);line-height:1.5"><strong id="ob2-s1-strong" style="color:var(--text1)">Search</strong><span id="ob2-s1-rest"> for your street or neighborhood to zoom the map there.</span></div>
       </div>
       <div style="display:flex;gap:12px;align-items:flex-start">
         <div style="width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">2</div>
-        <div style="font-size:13.5px;color:var(--text2);line-height:1.5"><strong style="color:var(--text1)">Drop pins</strong> on every missing or broken curb cut you find. Add a photo and description to each one.</div>
+        <div style="font-size:13.5px;color:var(--text2);line-height:1.5"><strong id="ob2-s2-strong" style="color:var(--text1)">Drop pins</strong><span id="ob2-s2-rest"> on every missing or broken curb cut you find. Add a photo and description to each one.</span></div>
       </div>
       <div style="display:flex;gap:12px;align-items:flex-start">
         <div style="width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">3</div>
-        <div style="font-size:13.5px;color:var(--text2);line-height:1.5"><strong style="color:var(--text1)">Fill in your details</strong> — your name, the city, and who the letter should go to.</div>
+        <div style="font-size:13.5px;color:var(--text2);line-height:1.5"><strong id="ob2-s3-strong" style="color:var(--text1)">Fill in your details</strong><span id="ob2-s3-rest"> — your name, the city, and who the letter should go to.</span></div>
       </div>
       <div style="display:flex;gap:12px;align-items:flex-start">
         <div style="width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">4</div>
-        <div style="font-size:13.5px;color:var(--text2);line-height:1.5"><strong style="color:var(--text1)">Generate a PDF</strong> — a formal ADA complaint letter with your map, photos, and every location documented.</div>
+        <div style="font-size:13.5px;color:var(--text2);line-height:1.5"><strong id="ob2-s4-strong" style="color:var(--text1)">Generate a PDF</strong><span id="ob2-s4-rest"> — a formal ADA complaint letter with your map, photos, and every location documented.</span></div>
       </div>
     </div>
-    <button id="onboard-welcome-start" onclick="startTour()" style="width:100%;height:48px;border-radius:12px;background:var(--navy);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s;border:none;font-family:inherit;cursor:pointer">
+    <button id="ob2-start-btn" onclick="startTour()" style="width:100%;height:48px;border-radius:12px;background:var(--navy);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s;border:none;font-family:inherit;cursor:pointer">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="6"/><polyline points="5.5,5 10,7.5 5.5,10"/></svg>
-      Show me where everything is
+      <span id="ob2-start-label">Show me where everything is</span>
     </button>
-    <button onclick="dismissTour()" style="display:block;text-align:center;margin-top:12px;font-size:13px;color:var(--text3);cursor:pointer;background:none;border:none;font-family:inherit;width:100%">I've got it — take me to the map</button>
+    <button onclick="dismissTour()" style="display:block;text-align:center;margin-top:12px;font-size:13px;color:var(--text3);cursor:pointer;background:none;border:none;font-family:inherit;width:100%"><span id="ob2-skip-label">I've got it — take me to the map</span></button>
   </div>
 </div>
 
@@ -2313,6 +2320,44 @@ function applyLang() {
   setText('lbl-mode-light', 'mode_light');
   setText('lbl-mode-dark', 'mode_dark');
   setText('lbl-mode-hc', 'mode_hc');
+
+  // Onboarding welcome cards
+  const obEnBtn = document.getElementById('ob-lang-en');
+  const obEsBtn = document.getElementById('ob-lang-es');
+  if (obEnBtn) { obEnBtn.style.background = lang === 'en' ? 'var(--navy)' : 'var(--surf2)'; obEnBtn.style.color = lang === 'en' ? '#fff' : 'var(--text2)'; }
+  if (obEsBtn) { obEsBtn.style.background = lang === 'es' ? 'var(--navy)' : 'var(--surf2)'; obEsBtn.style.color = lang === 'es' ? '#fff' : 'var(--text2)'; }
+  setText('ob-title', 'ob_title');
+  setText('ob-p1', 'ob_p1');
+  setText('ob-p2-s1', 'ob_p2_strong1');
+  setText('ob-p2-s2', 'ob_p2_strong2');
+  const obP2 = document.getElementById('ob-p2');
+  if (obP2) {
+    const s1 = document.getElementById('ob-p2-s1');
+    const s2 = document.getElementById('ob-p2-s2');
+    if (s1) s1.textContent = t('ob_p2_strong1');
+    if (s2) s2.textContent = t('ob_p2_strong2');
+    // Update surrounding text nodes
+    const nodes = Array.from(obP2.childNodes);
+    const pre = nodes.find(n => n.nodeType === 3 && n.textContent.trim().startsWith(t('ob_p2_pre').trim().slice(0,4)));
+    if (pre) pre.textContent = t('ob_p2_pre');
+    const mid = nodes.find(n => n.nodeType === 3 && n.textContent.includes(', document'));
+    if (mid) mid.textContent = t('ob_p2_mid');
+    const post = Array.from(obP2.childNodes).slice(-1)[0];
+    if (post && post.nodeType === 3) post.textContent = t('ob_p2_post');
+  }
+  setText('ob-how-btn', 'ob_how');
+  setText('ob-skip1-btn', 'ob_skip1');
+  setText('ob2-title', 'ob2_title');
+  setText('ob2-s1-strong', 'ob2_s1_strong');
+  setText('ob2-s1-rest', 'ob2_s1_rest');
+  setText('ob2-s2-strong', 'ob2_s2_strong');
+  setText('ob2-s2-rest', 'ob2_s2_rest');
+  setText('ob2-s3-strong', 'ob2_s3_strong');
+  setText('ob2-s3-rest', 'ob2_s3_rest');
+  setText('ob2-s4-strong', 'ob2_s4_strong');
+  setText('ob2-s4-rest', 'ob2_s4_rest');
+  setText('ob2-start-label', 'ob2_start');
+  setText('ob2-skip-label', 'ob2_skip');
 
   // Re-render marker lists (picks up edit/view/delete labels)
   renderMarkerLists();
