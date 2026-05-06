@@ -293,8 +293,11 @@ input, textarea, select { font-family: inherit; }
   }
 }
 
-/* Map tiles always stay full-colour — never inverted or filtered */
-body.dark .leaflet-tile-pane,
+/* Dark mode map: invert + hue-rotate gives a dark cartographic look */
+body.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) saturate(0.9) !important;
+}
+/* High contrast keeps tiles full-colour for readability */
 body.high-contrast .leaflet-tile-pane { filter: none !important; }
 
 /* Attribution */
@@ -312,29 +315,30 @@ body.high-contrast .leaflet-tile-pane { filter: none !important; }
 #map-fab-group {
   position: absolute;
   right: 14px;
-  bottom: 102px; /* fallback: peek (88) + 14px gap; overridden by JS on mobile */
+  bottom: 116px; /* peek (88) + 14px gap + 14px extra lift */
   z-index: 500;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .map-fab {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   background: var(--surface);
   box-shadow: var(--shadow);
   border: none;
   color: var(--text1);
-  font-size: 20px;
+  font-size: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: box-shadow 0.15s, transform 0.1s;
-  min-width: 44px;
-  min-height: 44px;
+  min-width: 56px;
+  min-height: 56px;
 }
+.map-fab svg { width: 22px; height: 22px; }
 .map-fab:active { transform: scale(0.94); box-shadow: var(--shadow-sm); }
 .map-fab.tracking {
   background: var(--red);
@@ -1728,6 +1732,22 @@ body.place-mode .pin-head {
               </button>
             </div>
 
+            <!-- Feedback -->
+            <div class="settings-label" style="margin-top:8px" id="lbl-feedback-section">Feedback</div>
+            <div class="settings-row" onclick="openFeedbackModal()">
+              <div class="settings-row-icon">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 2h16v12H2z" rx="1.5"/><path d="M6 18l4-4 4 4"/>
+                  <line x1="6" y1="7" x2="14" y2="7"/><line x1="6" y1="10" x2="11" y2="10"/>
+                </svg>
+              </div>
+              <div class="settings-row-text">
+                <div class="settings-row-title" id="lbl-feedback-title">Report a Bug or Request a Feature</div>
+                <div class="settings-row-sub" id="lbl-feedback-sub">Opens a GitHub issue</div>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg>
+            </div>
+
           </div>
         </div>
       </div>
@@ -1735,6 +1755,36 @@ body.place-mode .pin-head {
 
   </div><!-- /map-container -->
 </div><!-- /app-root -->
+
+<!-- FEEDBACK MODAL -->
+<div id="feedback-overlay" onclick="if(event.target===this)closeFeedbackModal()" style="position:fixed;inset:0;z-index:900;background:rgba(15,31,61,0.55);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;">
+  <div style="background:var(--surface);width:100%;max-width:540px;border-radius:22px 22px 0 0;padding:0 20px calc(28px + env(safe-area-inset-bottom,0));max-height:88vh;overflow-y:auto;animation:sheetUp 0.28s cubic-bezier(0.34,1.1,0.64,1);display:flex;flex-direction:column;gap:14px;">
+    <div style="padding:12px 0 4px;display:flex;align-items:center;justify-content:center;"><div style="width:38px;height:4px;background:var(--surf3);border-radius:2px;"></div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:18px;font-weight:700;color:var(--text1)" id="feedback-modal-title">Report a Bug or Request a Feature</div>
+      <button onclick="closeFeedbackModal()" style="width:32px;height:32px;border-radius:50%;background:var(--surf2);color:var(--text2);font-size:16px;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;">✕</button>
+    </div>
+    <div>
+      <div class="field-label" id="lbl-feedback-type">Type</div>
+      <div style="display:flex;gap:8px;">
+        <button id="fb-type-bug" onclick="setFeedbackType('bug')" style="flex:1;height:40px;border-radius:8px;border:1.5px solid var(--border);background:var(--blue);color:#fff;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">🐛 Bug</button>
+        <button id="fb-type-feature" onclick="setFeedbackType('feature')" style="flex:1;height:40px;border-radius:8px;border:1.5px solid var(--border);background:var(--surf2);color:var(--text2);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;">✨ Feature</button>
+      </div>
+    </div>
+    <div>
+      <div class="field-label" id="lbl-feedback-title-field">Title</div>
+      <input id="feedback-title-input" class="field-input" type="text" placeholder="Brief summary…">
+    </div>
+    <div>
+      <div class="field-label" id="lbl-feedback-desc">Description</div>
+      <textarea id="feedback-desc-input" class="field-input" style="min-height:100px" placeholder="What happened? What did you expect?"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeFeedbackModal()" style="flex:1;height:48px;border-radius:12px;border:1.5px solid var(--border);color:var(--text2);font-size:15px;font-weight:600;background:var(--surf2);cursor:pointer;font-family:inherit;" id="feedback-cancel-btn">Cancel</button>
+      <button onclick="submitFeedback()" style="flex:2;height:48px;border-radius:12px;background:var(--navy);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;font-family:inherit;" id="feedback-submit-btn">Submit</button>
+    </div>
+  </div>
+</div>
 
 <!-- EDIT MODAL -->
 <div id="modal-overlay" onclick="handleOverlayClick(event)">
@@ -3347,6 +3397,83 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('onboard-welcome').style.display = 'none';
   }
 });
+
+// ============================================================
+// FEEDBACK / GITHUB ISSUE
+// ============================================================
+const GITHUB_REPO = 'ekbrothers/curbcut-app';
+const GITHUB_TOKEN = ''; // set via setGithubToken() or provide at deploy time
+
+let feedbackType = 'bug';
+
+function openFeedbackModal() {
+  document.getElementById('feedback-overlay').style.display = 'flex';
+  setFeedbackType('bug');
+  document.getElementById('feedback-title-input').value = '';
+  document.getElementById('feedback-desc-input').value = '';
+}
+
+function closeFeedbackModal() {
+  document.getElementById('feedback-overlay').style.display = 'none';
+}
+
+function setFeedbackType(type) {
+  feedbackType = type;
+  const bugBtn = document.getElementById('fb-type-bug');
+  const featBtn = document.getElementById('fb-type-feature');
+  bugBtn.style.background = type === 'bug' ? 'var(--blue)' : 'var(--surf2)';
+  bugBtn.style.color = type === 'bug' ? '#fff' : 'var(--text2)';
+  bugBtn.style.borderColor = type === 'bug' ? 'var(--blue)' : 'var(--border)';
+  featBtn.style.background = type === 'feature' ? 'var(--blue)' : 'var(--surf2)';
+  featBtn.style.color = type === 'feature' ? '#fff' : 'var(--text2)';
+  featBtn.style.borderColor = type === 'feature' ? 'var(--blue)' : 'var(--border)';
+}
+
+async function submitFeedback() {
+  const title = document.getElementById('feedback-title-input').value.trim();
+  const body = document.getElementById('feedback-desc-input').value.trim();
+  if (!title) { showToast('Please add a title'); return; }
+
+  const token = GITHUB_TOKEN || window._githubToken;
+  if (!token) {
+    showToast('No GitHub token configured');
+    return;
+  }
+
+  const submitBtn = document.getElementById('feedback-submit-btn');
+  submitBtn.textContent = 'Submitting…';
+  submitBtn.disabled = true;
+
+  try {
+    const label = feedbackType === 'bug' ? 'bug' : 'enhancement';
+    const prefix = feedbackType === 'bug' ? '🐛 ' : '✨ ';
+    const resp = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/issues`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      body: JSON.stringify({
+        title: prefix + title,
+        body: body || '(no description provided)',
+        labels: [label]
+      })
+    });
+    if (resp.ok) {
+      const issue = await resp.json();
+      showToast('Submitted — thank you!');
+      closeFeedbackModal();
+    } else {
+      showToast('Submission failed — check your connection');
+    }
+  } catch(e) {
+    showToast('Submission failed — check your connection');
+  } finally {
+    submitBtn.textContent = 'Submit';
+    submitBtn.disabled = false;
+  }
+}
 
 // ============================================================
 // KEYBOARD
