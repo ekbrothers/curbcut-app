@@ -1300,6 +1300,7 @@ body.place-mode .pin-head {
         </div>
       </div>
       <div id="header-actions">
+        <button class="hdr-btn" id="lang-toggle-btn" onclick="setLang(lang==='en'?'es':'en')" title="Español / English">ES</button>
         <button class="hdr-btn" id="mob-search-btn-hdr" onclick="openMobSearch()" title="Search" style="display:none">
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <circle cx="7.5" cy="7.5" r="5"/>
@@ -1343,10 +1344,11 @@ body.place-mode .pin-head {
             <path d="M5 8.5C5 7.5 6 7 7 7.5L9 8.5L12.5 6.5C13.2 6.1 14 6.6 14 7.4V9.5L11 11.5V15C11 15.6 10.6 16 10 16H8C7.4 16 7 15.6 7 15V11L5 9.5V8.5Z" fill="white"/>
           </svg>
         </div>
-        <div>
+        <div style="flex:1;min-width:0;">
           <div id="sb-title">Curb Cut</div>
-          <div id="sb-sub">ADA Accessibility Survey</div>
+          <div id="sb-sub">ADA Survey Tool</div>
         </div>
+        <button id="lang-toggle-btn-sb" onclick="setLang(lang==='en'?'es':'en')" style="height:28px;padding:0 10px;border-radius:6px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.8);font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.05em;">ES</button>
       </div>
       <div id="sb-search-row">
         <input id="sb-search-input" type="text" placeholder="Search address or intersection…" onkeydown="if(event.key==='Enter')sbSearch()">
@@ -1355,21 +1357,21 @@ body.place-mode .pin-head {
       <div id="sb-mode-row">
         <button class="sb-mode-btn active" id="nav-btn" onclick="setMode('navigate')">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 1L12 6.5L6.5 12L1 6.5L6.5 1Z"/><circle cx="6.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/></svg>
-          Navigate
+          <span id="nav-btn-label">Navigate</span>
         </button>
         <button class="sb-mode-btn" id="place-btn" onclick="setMode('place')">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6.5" cy="5" r="2.5"/><path d="M6.5 13C6.5 13 2 8.5 2 5C2 2.2 4 0.5 6.5 0.5S11 2.2 11 5C11 8.5 6.5 13 6.5 13Z"/></svg>
-          Place Marker
+          <span id="place-btn-label">Place Marker</span>
         </button>
       </div>
       <div id="sb-gps-row">
         <button id="sb-gps-btn" onclick="toggleGps()">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6.5" cy="6.5" r="2"/><line x1="6.5" y1="1" x2="6.5" y2="3"/><line x1="6.5" y1="10" x2="6.5" y2="12"/><line x1="1" y1="6.5" x2="3" y2="6.5"/><line x1="10" y1="6.5" x2="12" y2="6.5"/></svg>
-          GPS Tracking
+          <span id="sb-gps-btn-label">GPS Tracking</span>
         </button>
         <button id="sb-pin-here-btn" onclick="dropPinAtGps()" style="height:34px;padding:0 12px;border-radius:8px;background:var(--green);border:none;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;font-family:inherit;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='var(--green-dk)'" onmouseout="this.style.background='var(--green)'">
           <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="5" r="2.5"/><path d="M7 13.5C7 13.5 1.5 8.5 1.5 5C1.5 2.5 4 0.5 7 0.5S12.5 2.5 12.5 5C12.5 8.5 7 13.5 7 13.5Z"/></svg>
-          Pin Here
+          <span id="sb-pin-here-label">Pin Here</span>
         </button>
         <span id="sb-gps-status">Not tracking</span>
       </div>
@@ -1380,32 +1382,32 @@ body.place-mode .pin-head {
       <div class="acc-section" id="acc-survey">
         <div class="acc-header" onclick="toggleAcc('acc-survey')">
           <div class="acc-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="1.5" width="12" height="13" rx="1.5"/><line x1="5" y1="5.5" x2="11" y2="5.5"/><line x1="5" y1="8.5" x2="11" y2="8.5"/><line x1="5" y1="11.5" x2="8.5" y2="11.5"/></svg></div>
-          <span class="acc-title">Survey Info</span>
+          <span class="acc-title" id="acc-survey-title">Survey Info</span>
           <span class="acc-chevron">▼</span>
         </div>
         <div class="acc-body">
           <div>
-            <div class="field-label">Surveyor Name</div>
+            <div class="field-label" id="lbl-d-surveyor">Surveyor Name</div>
             <input class="field-input" id="d-surveyor" type="text" placeholder="Your name" oninput="syncFields('surveyor', this.value)">
           </div>
           <div>
-            <div class="field-label">Survey Date</div>
+            <div class="field-label" id="lbl-d-date">Survey Date</div>
             <input class="field-input" id="d-date" type="date" oninput="syncFields('date', this.value)">
           </div>
           <div>
-            <div class="field-label">City / Location</div>
+            <div class="field-label" id="lbl-d-city">City / Location</div>
             <input class="field-input" id="d-city" type="text" placeholder="Springfield" oninput="syncFields('city', this.value)">
           </div>
           <div>
-            <div class="field-label">Department Name</div>
+            <div class="field-label" id="lbl-d-dept">Department Name</div>
             <input class="field-input" id="d-dept" type="text" placeholder="City Public Works Dept." oninput="syncFields('dept', this.value)">
           </div>
           <div>
-            <div class="field-label">Department Address</div>
+            <div class="field-label" id="lbl-d-deptaddr">Department Address</div>
             <input class="field-input" id="d-deptaddr" type="text" placeholder="123 Main St, City, ST 00000" oninput="syncFields('deptaddr', this.value)">
           </div>
           <div>
-            <div class="field-label">Survey Scope / Notes</div>
+            <div class="field-label" id="lbl-d-scope">Survey Scope / Notes</div>
             <textarea class="field-input" id="d-scope" placeholder="Describe the area surveyed…" oninput="syncFields('scope', this.value)"></textarea>
           </div>
         </div>
@@ -1415,7 +1417,7 @@ body.place-mode .pin-head {
       <div class="acc-section" id="acc-locs">
         <div class="acc-header" onclick="toggleAcc('acc-locs')">
           <div class="acc-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="6" r="2.5"/><path d="M8 15C8 15 2.5 10 2.5 6C2.5 3.0 5.0 1 8 1S13.5 3.0 13.5 6C13.5 10 8 15 8 15Z"/></svg></div>
-          <span class="acc-title">Marked Locations</span>
+          <span class="acc-title" id="acc-locs-title">Marked Locations</span>
           <span class="acc-badge" id="sb-loc-count" style="display:none">0</span>
           <span class="acc-chevron">▼</span>
         </div>
@@ -1425,7 +1427,7 @@ body.place-mode .pin-head {
           </div>
           <button class="pdf-btn" onclick="generatePDF()">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="1" width="11" height="13" rx="1.5"/><line x1="5" y1="5" x2="10" y2="5"/><line x1="5" y1="8" x2="10" y2="8"/><line x1="5" y1="11" x2="8" y2="11"/></svg>
-            Generate PDF Report
+            <span class="pdf-btn-label">Generate PDF Report</span>
           </button>
         </div>
       </div>
@@ -1472,19 +1474,19 @@ body.place-mode .pin-head {
           <span class="bs-tab-icon">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="6" r="2.5"/><path d="M8 15C8 15 2.5 10 2.5 6C2.5 3.0 5.0 1 8 1S13.5 3.0 13.5 6C13.5 10 8 15 8 15Z"/></svg>
           </span>
-          <span class="bs-tab-label">Locations</span>
+          <span class="bs-tab-label" id="bs-tab-label-0">Locations</span>
         </button>
         <button class="bs-tab" data-tab="1" onclick="switchBsTab(1)">
           <span class="bs-tab-icon">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="1.5" width="12" height="13" rx="1.5"/><line x1="5" y1="5.5" x2="11" y2="5.5"/><line x1="5" y1="8.5" x2="11" y2="8.5"/><line x1="5" y1="11.5" x2="8.5" y2="11.5"/></svg>
           </span>
-          <span class="bs-tab-label">Survey</span>
+          <span class="bs-tab-label" id="bs-tab-label-1">Survey</span>
         </button>
         <button class="bs-tab" data-tab="2" onclick="switchBsTab(2)">
           <span class="bs-tab-icon">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="1,3 6,1 10,3 15,1 15,13 10,15 6,13 1,15"/><line x1="6" y1="1" x2="6" y2="13"/><line x1="10" y1="3" x2="10" y2="15"/></svg>
           </span>
-          <span class="bs-tab-label">Tools</span>
+          <span class="bs-tab-label" id="bs-tab-label-2">Tools</span>
         </button>
       </div>
       </div><!-- /bs-drag-zone -->
@@ -1498,7 +1500,7 @@ body.place-mode .pin-head {
             </div>
             <button class="pdf-btn" onclick="generatePDF()" style="margin-top:10px">
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="1" width="11" height="13" rx="1.5"/><line x1="5" y1="5" x2="10" y2="5"/><line x1="5" y1="8" x2="10" y2="8"/><line x1="5" y1="11" x2="8" y2="11"/></svg>
-              Generate PDF Report
+              <span class="pdf-btn-label">Generate PDF Report</span>
             </button>
           </div>
         </div>
@@ -1507,27 +1509,27 @@ body.place-mode .pin-head {
         <div class="bs-panel" id="bs-panel-1">
           <div class="bs-inner" style="display:flex;flex-direction:column;gap:12px;">
             <div>
-              <div class="field-label">Surveyor Name</div>
+              <div class="field-label" id="lbl-m-surveyor">Surveyor Name</div>
               <input class="field-input" id="m-surveyor" type="text" placeholder="Your name" oninput="syncFields('surveyor', this.value)">
             </div>
             <div>
-              <div class="field-label">Survey Date</div>
+              <div class="field-label" id="lbl-m-date">Survey Date</div>
               <input class="field-input" id="m-date" type="date" oninput="syncFields('date', this.value)">
             </div>
             <div>
-              <div class="field-label">City / Location</div>
+              <div class="field-label" id="lbl-m-city">City / Location</div>
               <input class="field-input" id="m-city" type="text" placeholder="Springfield" oninput="syncFields('city', this.value)">
             </div>
             <div>
-              <div class="field-label">Department Name</div>
+              <div class="field-label" id="lbl-m-dept">Department Name</div>
               <input class="field-input" id="m-dept" type="text" placeholder="City Public Works Dept." oninput="syncFields('dept', this.value)">
             </div>
             <div>
-              <div class="field-label">Department Address</div>
+              <div class="field-label" id="lbl-m-deptaddr">Department Address</div>
               <input class="field-input" id="m-deptaddr" type="text" placeholder="123 Main St" oninput="syncFields('deptaddr', this.value)">
             </div>
             <div>
-              <div class="field-label">Survey Notes</div>
+              <div class="field-label" id="lbl-m-scope">Survey Notes</div>
               <textarea class="field-input" id="m-scope" placeholder="Describe the area surveyed…" oninput="syncFields('scope', this.value)"></textarea>
             </div>
           </div>
@@ -1536,22 +1538,15 @@ body.place-mode .pin-head {
         <!-- Tools tab -->
         <div class="bs-panel" id="bs-panel-2">
           <div class="bs-inner" style="display:flex;flex-direction:column;gap:12px;">
-            <div>
-              <div class="field-label">Search Address</div>
-              <div style="display:flex;gap:8px;">
-                <input class="field-input" id="bs-search-input" type="text" placeholder="Enter address…" style="flex:1;" onkeydown="if(event.key==='Enter')bsSearch()">
-                <button onclick="bsSearch()" style="background:var(--blue);color:#fff;border-radius:8px;padding:0 16px;font-size:13px;font-weight:700;height:40px;white-space:nowrap;flex-shrink:0;">Go</button>
-              </div>
-            </div>
             <button onclick="dropPinAtGps()" style="width:100%;height:48px;border-radius:10px;background:var(--green);color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;border:none;font-family:inherit;cursor:pointer;transition:background 0.15s,transform 0.1s;" onmouseover="this.style.background='var(--green-dk)'" onmouseout="this.style.background='var(--green)'" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform=''">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="6" r="2.5"/><path d="M8 15C8 15 2.5 10 2.5 6C2.5 3.0 5.0 1 8 1S13.5 3.0 13.5 6C13.5 10 8 15 8 15Z"/></svg>
-              Drop Pin at My Location
+              <span id="bs-drop-pin-label">Drop Pin at My Location</span>
             </button>
             <div id="mob-gps-status-tools" style="font-size:12px;color:var(--text3);"></div>
             <div style="height:1px;background:var(--border);"></div>
             <button class="pdf-btn" onclick="generatePDF()">
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="1" width="11" height="13" rx="1.5"/><line x1="5" y1="5" x2="10" y2="5"/><line x1="5" y1="8" x2="10" y2="8"/><line x1="5" y1="11" x2="8" y2="11"/></svg>
-              Generate PDF Report
+              <span class="pdf-btn-label">Generate PDF Report</span>
             </button>
           </div>
         </div>
@@ -1661,6 +1656,398 @@ body.place-mode .pin-head {
 
 <script>
 // ============================================================
+// I18N
+// ============================================================
+let lang = localStorage.getItem('curbCutLang') || 'en';
+
+const strings = {
+  en: {
+    // Header
+    header_subtitle: 'ADA Survey Tool',
+    search_title: 'Search',
+    save_title: 'Save',
+    clear_title: 'Clear All',
+    place_pin: 'Place Pin',
+    cancel: 'Cancel',
+    // Place mode banner
+    place_banner: 'Tap map to place pin — tap pin to remove',
+    // Mobile search
+    search_placeholder: 'Search address or intersection…',
+    go: 'Go',
+    // Mode buttons
+    navigate: 'Navigate',
+    place_marker: 'Place Marker',
+    gps_tracking: 'GPS Tracking',
+    stop_gps: 'Stop GPS',
+    pin_here: 'Pin Here',
+    // GPS status
+    gps_not_tracking: 'Not tracking',
+    gps_tracking_status: 'Tracking · {pts} pts{area}',
+    gps_stopped_status: 'Stopped · {pts} pts recorded',
+    // Tabs
+    tab_locations: 'Locations',
+    tab_survey: 'Survey',
+    tab_tools: 'Tools',
+    // Survey form
+    section_survey: 'Survey Info',
+    section_locations: 'Marked Locations',
+    field_surveyor: 'Surveyor Name',
+    ph_surveyor: 'Your name',
+    field_date: 'Survey Date',
+    field_city: 'City / Location',
+    ph_city: 'Springfield',
+    field_dept: 'Department Name',
+    ph_dept: 'City Public Works Dept.',
+    field_deptaddr: 'Department Address',
+    ph_deptaddr: '123 Main St, City, ST 00000',
+    ph_deptaddr_short: '123 Main St',
+    field_scope: 'Survey Scope / Notes',
+    field_scope_mobile: 'Survey Notes',
+    ph_scope: 'Describe the area surveyed…',
+    // Tools tab
+    drop_pin_gps: 'Drop Pin at My Location',
+    search_address: 'Search Address',
+    ph_search: 'Enter address…',
+    // Locations list
+    empty_desktop: 'No locations yet.\nSwitch to Place Marker and tap the map.',
+    empty_mobile: 'No locations marked yet.\nTap Place Pin then tap the map.',
+    // PDF button
+    generate_pdf: 'Generate PDF Report',
+    // Marker card
+    edit: 'Edit',
+    view: 'View',
+    delete: 'Delete',
+    // Modal
+    modal_title: 'Location #{n}',
+    modal_desc_label: 'Description / Issue',
+    modal_desc_ph: 'Describe the accessibility issue…',
+    modal_desc_ph_geocoding: 'Looking up address…',
+    modal_photo_label: 'Photo (optional)',
+    modal_attach: 'Attach Photo',
+    modal_cancel: 'Cancel',
+    modal_save: 'Save Location',
+    // Toast
+    toast_saved_session: 'Saved successfully',
+    toast_cleared: 'Cleared',
+    toast_location_saved: 'Location saved',
+    toast_pdf_downloaded: 'PDF downloaded',
+    toast_getting_location: 'Getting your location…',
+    toast_pin_dropped: 'Pin dropped at your location',
+    toast_location_error: 'Could not get location — check permissions',
+    toast_geolocation_na: 'Geolocation not supported',
+    // Geocode
+    geocode_default: 'Location at {coords}',
+    geocode_corner: 'Corner at {loc} — curb cut needed',
+    geocode_tap: 'tap to edit',
+    geocode_looking: 'Looking up address…',
+    // Confirm
+    confirm_clear: 'Clear all markers, GPS data, and form fields?',
+    alert_not_found: 'Location not found.',
+    // Onboarding welcome screen 1
+    ob_title: 'Curb Cut — ADA Survey Tool',
+    ob_p1: 'Curb cuts — the small ramps where sidewalks meet streets — are legally required under the Americans with Disabilities Act. When they\'re missing, broken, or too steep, people who use wheelchairs, walkers, or strollers can be completely blocked from moving through their own neighborhood.',
+    ob_p2_pre: 'This tool helps you ',
+    ob_p2_strong1: 'map problem locations',
+    ob_p2_mid: ', document them with photos, and ',
+    ob_p2_strong2: 'generate a formal complaint letter',
+    ob_p2_post: ' addressed to your local public works department — so your findings can actually drive change.',
+    ob_how: 'How does it work?',
+    ob_skip1: 'Skip — jump straight to the map',
+    // Onboarding screen 2
+    ob2_title: 'Here\'s how it works',
+    ob2_s1_strong: 'Search',
+    ob2_s1_rest: ' for your street or neighborhood to zoom the map there.',
+    ob2_s2_strong: 'Drop pins',
+    ob2_s2_rest: ' on every missing or broken curb cut you find. Add a photo and description to each one.',
+    ob2_s3_strong: 'Fill in your details',
+    ob2_s3_rest: ' — your name, the city, and who the letter should go to.',
+    ob2_s4_strong: 'Generate a PDF',
+    ob2_s4_rest: ' — a formal ADA complaint letter with your map, photos, and every location documented.',
+    ob2_start: 'Show me where everything is',
+    ob2_skip: 'I\'ve got it — take me to the map',
+    // Tour
+    tour_skip: 'Skip',
+    tour_next: 'Next',
+    tour_done: 'Done',
+    tour_step_of: 'Step {a} of {b}',
+    tour1_title: 'Search for your neighborhood',
+    tour1_body: 'Type an address or intersection to jump to your survey area.',
+    tour2_title: 'Switch to Place Marker mode',
+    tour2_body: 'Tap this button to enter placement mode — then tap anywhere on the map to drop a pin at a problem location.',
+    tour3_title: 'Mark locations on the map',
+    tour3_body: 'Tap the map to drop a pin, or use "Drop Pin at My Location" in the Tools tab to pin your exact GPS position.',
+    tour4_title: 'Fill in your survey details',
+    tour4_body_mobile: 'Swipe up the bottom panel and tap Survey to add your name, city, and department contact info.',
+    tour4_body_desktop: 'Expand Survey Info in the sidebar to add your name, the city, and the department you\'re writing to.',
+    tour5_title: 'Generate your PDF report',
+    tour5_body: 'When you\'re done, tap "Generate PDF Report" to download a formal ADA complaint letter with your map, photos, and every location documented.',
+    // Lang toggle
+    lang_toggle: 'ES',
+    // PDF
+    pdf_header: 'Curb Cut Survey — ADA Accessibility Report',
+    pdf_footer: 'Curb Cut Survey Tool — ADA Accessibility Report',
+    pdf_re: 'Re: ADA Curb Cut Compliance Survey — {city}',
+    pdf_dear_default: 'Dear Public Works Officials,',
+    pdf_dear_dept: 'Dear {dept} Officials,',
+    pdf_p1: 'As someone with accessibility needs, I depend on safe, compliant pedestrian infrastructure to move through my community independently. The Americans with Disabilities Act of 1990 provides important protections in this regard — particularly Title II, which affirms that state and local governments must ensure their programs, services, and public rights-of-way are accessible to people with disabilities. It is from that personal experience, and with the hope of a more inclusive {city}, that I write to bring several locations to your attention.',
+    pdf_p2: 'As part of a careful accessibility survey I conducted in {scope}, I identified {count} location{s} where curb cuts are either absent, severely deteriorated, or do not meet current accessibility standards — including the 2010 ADA Standards for Accessible Design (Section 406) and the Public Rights-of-Way Accessibility Guidelines (PROWAG).',
+    pdf_p3: 'Missing or inadequate curb cuts create very real daily barriers for people who use wheelchairs, scooters, walkers, and other mobility aids, as well as for parents with strollers and individuals with visual impairments who rely on detectable warning surfaces. For many of us, these gaps in infrastructure mean having to travel significantly out of the way, enter traffic, or simply forgo trips that others take for granted.',
+    pdf_p4: 'I respectfully ask that {dept} review the attached survey documentation, which includes GPS-verified locations, photographs, and descriptions of each site. I hope your department will consider establishing a remediation timeline and prioritizing these locations for curb cut installation or repair in the next available capital improvement cycle.',
+    pdf_p5: 'Thank you sincerely for your time and attention to this matter. I would welcome the opportunity to meet with department representatives to walk the survey area together and discuss these findings further. Please do not hesitate to contact me — I am happy to help in any way I can.',
+    pdf_closing: 'Respectfully submitted,',
+    pdf_map_overview: 'Survey Map',
+    pdf_map_all: 'Survey Map — All {count} Location{s} (Overview)',
+    pdf_map_chunk: 'Survey Map — Locations {a}–{b}',
+    pdf_loc_header: 'Location #{n}',
+    pdf_desc_label: 'Description:',
+    pdf_coords_label: 'GPS Coordinates:',
+    pdf_gmaps: 'View on Google Maps',
+    pdf_quick_ref: 'Quick Reference — All Locations',
+    pdf_no_desc: '(No description)',
+    pdf_map_unavailable: '(Map screenshot unavailable)',
+  },
+  es: {
+    // Header
+    header_subtitle: 'Herramienta de Inspección ADA',
+    search_title: 'Buscar',
+    save_title: 'Guardar',
+    clear_title: 'Borrar Todo',
+    place_pin: 'Marcar',
+    cancel: 'Cancelar',
+    // Place mode banner
+    place_banner: 'Toca el mapa para marcar — toca el pin para eliminarlo',
+    // Mobile search
+    search_placeholder: 'Buscar dirección o intersección…',
+    go: 'Ir',
+    // Mode buttons
+    navigate: 'Navegar',
+    place_marker: 'Colocar Marcador',
+    gps_tracking: 'Seguimiento GPS',
+    stop_gps: 'Detener GPS',
+    pin_here: 'Marcar Aquí',
+    // GPS status
+    gps_not_tracking: 'Sin seguimiento',
+    gps_tracking_status: 'Rastreando · {pts} pts{area}',
+    gps_stopped_status: 'Detenido · {pts} pts registrados',
+    // Tabs
+    tab_locations: 'Ubicaciones',
+    tab_survey: 'Inspección',
+    tab_tools: 'Herramientas',
+    // Survey form
+    section_survey: 'Información de la Inspección',
+    section_locations: 'Ubicaciones Marcadas',
+    field_surveyor: 'Nombre del Inspector',
+    ph_surveyor: 'Tu nombre',
+    field_date: 'Fecha de Inspección',
+    field_city: 'Ciudad / Lugar',
+    ph_city: 'Springfield',
+    field_dept: 'Nombre del Departamento',
+    ph_dept: 'Depto. de Obras Públicas',
+    field_deptaddr: 'Dirección del Departamento',
+    ph_deptaddr: '123 Calle Principal, Ciudad, ST 00000',
+    ph_deptaddr_short: '123 Calle Principal',
+    field_scope: 'Alcance / Notas de la Inspección',
+    field_scope_mobile: 'Notas de la Inspección',
+    ph_scope: 'Describe el área inspeccionada…',
+    // Tools tab
+    drop_pin_gps: 'Marcar Mi Ubicación Actual',
+    search_address: 'Buscar Dirección',
+    ph_search: 'Ingresa una dirección…',
+    // Locations list
+    empty_desktop: 'Sin ubicaciones aún.\nCambia a Colocar Marcador y toca el mapa.',
+    empty_mobile: 'Sin ubicaciones marcadas.\nToca Marcar y luego el mapa.',
+    // PDF button
+    generate_pdf: 'Generar Informe PDF',
+    // Marker card
+    edit: 'Editar',
+    view: 'Ver',
+    delete: 'Eliminar',
+    // Modal
+    modal_title: 'Ubicación #{n}',
+    modal_desc_label: 'Descripción / Problema',
+    modal_desc_ph: 'Describe el problema de accesibilidad…',
+    modal_desc_ph_geocoding: 'Buscando dirección…',
+    modal_photo_label: 'Foto (opcional)',
+    modal_attach: 'Adjuntar Foto',
+    modal_cancel: 'Cancelar',
+    modal_save: 'Guardar Ubicación',
+    // Toast
+    toast_saved_session: 'Guardado exitosamente',
+    toast_cleared: 'Borrado',
+    toast_location_saved: 'Ubicación guardada',
+    toast_pdf_downloaded: 'PDF descargado',
+    toast_getting_location: 'Obteniendo tu ubicación…',
+    toast_pin_dropped: 'Pin colocado en tu ubicación',
+    toast_location_error: 'No se pudo obtener la ubicación — verifica los permisos',
+    toast_geolocation_na: 'Geolocalización no compatible',
+    // Geocode
+    geocode_default: 'Ubicación en {coords}',
+    geocode_corner: 'Esquina en {loc} — se necesita rampa',
+    geocode_tap: 'toca para editar',
+    geocode_looking: 'Buscando dirección…',
+    // Confirm
+    confirm_clear: '¿Borrar todos los marcadores, datos GPS y campos del formulario?',
+    alert_not_found: 'Ubicación no encontrada.',
+    // Onboarding welcome screen 1
+    ob_title: 'Curb Cut — Herramienta de Inspección ADA',
+    ob_p1: 'Las rampas de acera — las pequeñas rampas donde las aceras se unen con las calles — son legalmente obligatorias según la Ley de Estadounidenses con Discapacidades. Cuando faltan, están deterioradas o son demasiado empinadas, las personas que usan sillas de ruedas, andadores o carriolas pueden quedar completamente bloqueadas para moverse por su propio vecindario.',
+    ob_p2_pre: 'Esta herramienta te ayuda a ',
+    ob_p2_strong1: 'mapear ubicaciones problemáticas',
+    ob_p2_mid: ', documentarlas con fotos y ',
+    ob_p2_strong2: 'generar una carta formal de queja',
+    ob_p2_post: ' dirigida al departamento de obras públicas local — para que tus hallazgos realmente generen un cambio.',
+    ob_how: '¿Cómo funciona?',
+    ob_skip1: 'Omitir — ir directamente al mapa',
+    // Onboarding screen 2
+    ob2_title: 'Así es como funciona',
+    ob2_s1_strong: 'Busca',
+    ob2_s1_rest: ' tu calle o vecindario para acercar el mapa.',
+    ob2_s2_strong: 'Coloca pines',
+    ob2_s2_rest: ' en cada rampa faltante o deteriorada que encuentres. Agrega una foto y descripción a cada una.',
+    ob2_s3_strong: 'Completa tus datos',
+    ob2_s3_rest: ' — tu nombre, la ciudad y a quién va dirigida la carta.',
+    ob2_s4_strong: 'Genera un PDF',
+    ob2_s4_rest: ' — una carta formal de queja con tu mapa, fotos y cada ubicación documentada.',
+    ob2_start: 'Muéstrame dónde está todo',
+    ob2_skip: 'Lo entiendo — llévame al mapa',
+    // Tour
+    tour_skip: 'Omitir',
+    tour_next: 'Siguiente',
+    tour_done: 'Listo',
+    tour_step_of: 'Paso {a} de {b}',
+    tour1_title: 'Busca tu vecindario',
+    tour1_body: 'Escribe una dirección o intersección para navegar a tu área de inspección.',
+    tour2_title: 'Cambia al modo Colocar Marcador',
+    tour2_body: 'Toca este botón para entrar al modo de colocación — luego toca el mapa para colocar un pin en una ubicación problemática.',
+    tour3_title: 'Marca ubicaciones en el mapa',
+    tour3_body: 'Toca el mapa para colocar un pin, o usa "Marcar Mi Ubicación Actual" en la pestaña Herramientas para marcar tu posición GPS exacta.',
+    tour4_title: 'Completa los detalles de tu inspección',
+    tour4_body_mobile: 'Desliza hacia arriba el panel inferior y toca Inspección para agregar tu nombre, ciudad e información de contacto del departamento.',
+    tour4_body_desktop: 'Expande Información de la Inspección en la barra lateral para agregar tu nombre, la ciudad y el departamento al que escribes.',
+    tour5_title: 'Genera tu informe PDF',
+    tour5_body: 'Cuando termines, toca "Generar Informe PDF" para descargar una carta formal de queja con tu mapa, fotos y cada ubicación documentada.',
+    // Lang toggle
+    lang_toggle: 'EN',
+    // PDF
+    pdf_header: 'Inspección Curb Cut — Informe de Accesibilidad ADA',
+    pdf_footer: 'Herramienta de Inspección Curb Cut — Informe ADA',
+    pdf_re: 'Asunto: Inspección de Accesibilidad ADA — {city}',
+    pdf_dear_default: 'Estimados funcionarios de Obras Públicas:',
+    pdf_dear_dept: 'Estimados funcionarios de {dept}:',
+    pdf_p1: 'Como persona con necesidades de accesibilidad, dependo de una infraestructura peatonal segura y conforme para moverme de manera independiente por mi comunidad. La Ley de Estadounidenses con Discapacidades de 1990 ofrece protecciones importantes al respecto — en particular el Título II, que establece que los gobiernos estatales y locales deben garantizar que sus programas, servicios y vías públicas sean accesibles para las personas con discapacidades. Es desde esa experiencia personal, y con la esperanza de una {city} más inclusiva, que escribo para llamar su atención sobre varias ubicaciones.',
+    pdf_p2: 'Como parte de una cuidadosa inspección de accesibilidad que realicé en {scope}, identifiqué {count} ubicación{s} donde las rampas de acera están ausentes, gravemente deterioradas o no cumplen con los estándares de accesibilidad vigentes — incluidos los Estándares de Diseño Accesible ADA 2010 (Sección 406) y las Directrices de Accesibilidad para Derechos de Vía Públicos (PROWAG).',
+    pdf_p3: 'Las rampas de acera inadecuadas o inexistentes crean barreras diarias muy reales para las personas que utilizan sillas de ruedas, scooters, andadores y otros dispositivos de movilidad, así como para padres con carriolas y personas con discapacidades visuales que dependen de superficies de advertencia detectables. Para muchos de nosotros, estas deficiencias en la infraestructura implican tener que desviarse considerablemente, circular por la calzada o simplemente renunciar a desplazamientos que otros dan por sentados.',
+    pdf_p4: 'Solicito respetuosamente que {dept} revise la documentación de inspección adjunta, que incluye ubicaciones verificadas por GPS, fotografías y descripciones de cada sitio. Espero que su departamento considere establecer un calendario de reparaciones y priorice estas ubicaciones para la instalación o reparación de rampas en el próximo ciclo de mejoras de capital disponible.',
+    pdf_p5: 'Le agradezco sinceramente su tiempo y atención a este asunto. Estaría encantado/a de reunirme con representantes del departamento para recorrer el área inspeccionada juntos y analizar estos hallazgos con más detalle. No dude en ponerse en contacto conmigo — con gusto colaboraré en todo lo que pueda.',
+    pdf_closing: 'Atentamente,',
+    pdf_map_overview: 'Mapa de Inspección',
+    pdf_map_all: 'Mapa de Inspección — Las {count} Ubicación{s} (Resumen)',
+    pdf_map_chunk: 'Mapa de Inspección — Ubicaciones {a}–{b}',
+    pdf_loc_header: 'Ubicación #{n}',
+    pdf_desc_label: 'Descripción:',
+    pdf_coords_label: 'Coordenadas GPS:',
+    pdf_gmaps: 'Ver en Google Maps',
+    pdf_quick_ref: 'Referencia Rápida — Todas las Ubicaciones',
+    pdf_no_desc: '(Sin descripción)',
+    pdf_map_unavailable: '(Captura de mapa no disponible)',
+  }
+};
+
+function t(key, vars) {
+  const s = (strings[lang] || strings.en);
+  let str = s[key] !== undefined ? s[key] : (strings.en[key] || key);
+  if (vars) Object.keys(vars).forEach(k => { str = str.replace(new RegExp('{' + k + '}', 'g'), vars[k]); });
+  return str;
+}
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('curbCutLang', l);
+  applyLang();
+}
+
+function applyLang() {
+  const setText = (id, key, vars) => { const el = document.getElementById(id); if (el) el.textContent = t(key, vars); };
+  const setPlaceholder = (id, key) => { const el = document.getElementById(id); if (el) el.placeholder = t(key); };
+  const setTitle = (id, key) => { const el = document.getElementById(id); if (el) el.title = t(key); };
+
+  // Header
+  setText('header-sub', 'header_subtitle');
+  setText('mob-place-label', mode === 'place' ? 'cancel' : 'place_pin');
+  setTitle('mob-search-btn-hdr', 'search_title');
+
+  // Mobile search
+  setPlaceholder('mob-search-input', 'search_placeholder');
+  setText('mob-search-go', 'go');
+
+  // Place mode banner
+  const bannerText = document.querySelector('#place-mode-banner');
+  if (bannerText) {
+    const dot = bannerText.querySelector('.banner-dot');
+    bannerText.innerHTML = '';
+    if (dot) bannerText.appendChild(dot);
+    bannerText.appendChild(document.createTextNode(' ' + t('place_banner')));
+  }
+
+  // Sidebar
+  setText('sb-sub', 'header_subtitle');
+  setPlaceholder('sb-search-input', 'search_placeholder');
+  setText('sb-search-go', 'go');
+  setText('nav-btn-label', 'navigate');
+  setText('place-btn-label', 'place_marker');
+  setText('sb-gps-btn-label', gpsTracking ? 'stop_gps' : 'gps_tracking');
+  setText('sb-pin-here-label', 'pin_here');
+
+  // Accordion titles
+  setText('acc-survey-title', 'section_survey');
+  setText('acc-locs-title', 'section_locations');
+
+  // Sidebar survey fields
+  setText('lbl-d-surveyor', 'field_surveyor');
+  setPlaceholder('d-surveyor', 'ph_surveyor');
+  setText('lbl-d-date', 'field_date');
+  setText('lbl-d-city', 'field_city');
+  setPlaceholder('d-city', 'ph_city');
+  setText('lbl-d-dept', 'field_dept');
+  setPlaceholder('d-dept', 'ph_dept');
+  setText('lbl-d-deptaddr', 'field_deptaddr');
+  setPlaceholder('d-deptaddr', 'ph_deptaddr');
+  setText('lbl-d-scope', 'field_scope');
+  setPlaceholder('d-scope', 'ph_scope');
+
+  // Bottom sheet tabs
+  setText('bs-tab-label-0', 'tab_locations');
+  setText('bs-tab-label-1', 'tab_survey');
+  setText('bs-tab-label-2', 'tab_tools');
+
+  // Mobile survey fields
+  setText('lbl-m-surveyor', 'field_surveyor');
+  setPlaceholder('m-surveyor', 'ph_surveyor');
+  setText('lbl-m-date', 'field_date');
+  setText('lbl-m-city', 'field_city');
+  setPlaceholder('m-city', 'ph_city');
+  setText('lbl-m-dept', 'field_dept');
+  setPlaceholder('m-dept', 'ph_dept');
+  setText('lbl-m-deptaddr', 'field_deptaddr');
+  setPlaceholder('m-deptaddr', 'ph_deptaddr_short');
+  setText('lbl-m-scope', 'field_scope_mobile');
+  setPlaceholder('m-scope', 'ph_scope');
+
+  // Tools tab
+  setText('bs-drop-pin-label', 'drop_pin_gps');
+
+  // PDF buttons
+  document.querySelectorAll('.pdf-btn-label').forEach(el => { el.textContent = t('generate_pdf'); });
+
+  // Lang toggle buttons
+  setText('lang-toggle-btn', 'lang_toggle');
+  const sb = document.getElementById('lang-toggle-btn-sb'); if (sb) sb.textContent = t('lang_toggle');
+
+  // Re-render marker lists (picks up edit/view/delete labels)
+  renderMarkerLists();
+}
+
+// ============================================================
 // STATE
 // ============================================================
 let map;
@@ -1706,6 +2093,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBottomSheet();
   restoreSession();
   renderMarkerLists();
+  applyLang();
 });
 
 window.addEventListener('resize', () => {
@@ -1796,12 +2184,12 @@ function toggleMobPlace() {
     mode = 'place';
     document.body.classList.add('place-mode');
     btn.classList.add('active');
-    label.textContent = 'Cancel';
+    label.textContent = t('cancel');
   } else {
     mode = 'navigate';
     document.body.classList.remove('place-mode');
     btn.classList.remove('active');
-    label.textContent = 'Place Pin';
+    label.textContent = t('place_pin');
   }
 }
 
@@ -1810,7 +2198,7 @@ function toggleMobPlace() {
 // ============================================================
 function dropPin(lat, lng) {
   const id = nextId++;
-  const marker = { id, lat, lng, desc: 'Looking up address…', autoDesc: true, photo: null, geocoding: true };
+  const marker = { id, lat, lng, desc: t('geocode_looking'), autoDesc: true, photo: null, geocoding: true };
   marker.leafletMarker = createLeafletMarker(id, lat, lng);
   markers.push(marker);
   refreshMarkerIcons();
@@ -1822,7 +2210,7 @@ function dropPin(lat, lng) {
     if (m && m.autoDesc) { m.desc = desc; m.geocoding = false; renderMarkerLists(); autoSave(); }
   }).catch(() => {
     const m = markers.find(x => x.id === id);
-    if (m && m.autoDesc) { m.desc = `Location at ${lat.toFixed(5)}, ${lng.toFixed(5)}`; m.geocoding = false; renderMarkerLists(); autoSave(); }
+    if (m && m.autoDesc) { m.desc = t('geocode_default', {coords: lat.toFixed(5)+', '+lng.toFixed(5)}); m.geocoding = false; renderMarkerLists(); autoSave(); }
   });
 }
 
@@ -1868,7 +2256,7 @@ async function reverseGeocode(lat, lng) {
   const state = a.state || '';
   let loc = [street, city, state].filter(Boolean).join(', ');
   if (!loc) loc = data.display_name ? data.display_name.split(',').slice(0, 2).join(',') : `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-  return `Corner at ${loc} — curb cut needed`;
+  return t('geocode_corner', {loc});
 }
 
 // ============================================================
@@ -1878,11 +2266,11 @@ function openModal(id) {
   editingId = id;
   const m = markers.find(x => x.id === id);
   if (!m) return;
-  document.getElementById('modal-title').textContent = `Location #${markers.indexOf(m) + 1}`;
+  document.getElementById('modal-title').textContent = t('modal_title', {n: markers.indexOf(m) + 1});
   document.getElementById('modal-coords').textContent = `${m.lat.toFixed(6)}, ${m.lng.toFixed(6)}`;
   const desc = document.getElementById('modal-desc');
   desc.value = m.geocoding ? '' : m.desc;
-  desc.placeholder = m.geocoding ? 'Looking up address…' : 'Describe the accessibility issue…';
+  desc.placeholder = m.geocoding ? t('modal_desc_ph_geocoding') : t('modal_desc_ph');
   if (m.geocoding) desc.classList.add('geocode-pulse'); else desc.classList.remove('geocode-pulse');
   pendingPhoto = m.photo || null;
   const preview = document.getElementById('modal-photo-preview');
@@ -1909,7 +2297,7 @@ function saveMarker() {
   m.autoDesc = false; m.geocoding = false;
   if (pendingPhoto !== undefined) m.photo = pendingPhoto;
   renderMarkerLists(); autoSave(); closeModal();
-  showToast('Location saved');
+  showToast(t('toast_location_saved'));
 }
 
 function handlePhoto(e) {
@@ -1967,7 +2355,7 @@ function markerCardHTML(m, i) {
   const num = i + 1;
   const descHTML = m.geocoding
     ? `<span class="geocode-pulse">${esc(m.desc)}</span>`
-    : `${esc(m.desc)}${m.autoDesc ? '<span class="auto-badge">tap to edit</span>' : ''}`;
+    : `${esc(m.desc)}${m.autoDesc ? `<span class="auto-badge">${t('geocode_tap')}</span>` : ''}`;
   const photoHTML = m.photo ? `<img class="mc-thumb" src="${m.photo}" alt="photo">` : '';
   return `
     <div class="marker-card" id="mc-${m.id}">
@@ -1980,15 +2368,15 @@ function markerCardHTML(m, i) {
       <div class="mc-actions">
         <button class="mc-btn" onclick="openModal(${m.id})">
           <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 1.5L9.5 3.5L3.5 9.5H1.5V7.5L7.5 1.5Z"/></svg>
-          Edit
+          ${t('edit')}
         </button>
         <button class="mc-btn" onclick="flyTo(${m.lat},${m.lng})">
           <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="5.5" cy="5" r="2"/><path d="M5.5 11C5.5 11 2 7.5 2 5C2 2.8 3.6 1 5.5 1S9 2.8 9 5C9 7.5 5.5 11 5.5 11Z"/></svg>
-          View
+          ${t('view')}
         </button>
         <button class="mc-btn del" onclick="deleteMarker(${m.id})">
           <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="2,2.5 9,2.5"/><path d="M4 2.5V1.5H7V2.5"/><path d="M3.5 2.5L4 9.5H7L7.5 2.5"/></svg>
-          Delete
+          ${t('delete')}
         </button>
       </div>
     </div>
@@ -1999,7 +2387,13 @@ function renderList(containerId, isMob) {
   const el = document.getElementById(containerId);
   if (!el) return;
   if (markers.length === 0) {
-    el.innerHTML = `<div class="empty-state">No locations marked yet.<br>${isMob ? 'Tap <strong>Place Pin</strong> then tap the map.' : 'Switch to Place Marker and tap the map.'}</div>`;
+    if (isMob) {
+      const parts = t('empty_mobile').split('\n');
+      el.innerHTML = `<div class="empty-state">${esc(parts[0])}<br><strong>${esc(parts[1] || '')}</strong></div>`;
+    } else {
+      const parts = t('empty_desktop').split('\n');
+      el.innerHTML = `<div class="empty-state">${esc(parts[0])}<br>${esc(parts[1] || '')}</div>`;
+    }
     return;
   }
   el.innerHTML = markers.map((m, i) => markerCardHTML(m, i)).join('');
@@ -2057,7 +2451,7 @@ async function geocodeSearch(query) {
   const resp = await fetch(url, { headers: { 'Accept-Language': 'en' } });
   const data = await resp.json();
   if (data && data[0]) { map.flyTo([parseFloat(data[0].lat), parseFloat(data[0].lon)], 16); }
-  else { alert('Location not found.'); }
+  else { alert(t('alert_not_found')); }
 }
 
 function sbSearch() {
@@ -2128,16 +2522,16 @@ function onGpsPos(pos) {
 function onGpsErr(err) { console.warn('GPS error', err); }
 
 function dropPinAtGps() {
-  if (!navigator.geolocation) { showToast('Geolocation not supported'); return; }
-  showToast('Getting your location…');
+  if (!navigator.geolocation) { showToast(t('toast_geolocation_na')); return; }
+  showToast(t('toast_getting_location'));
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       lastGpsPos = pos;
       dropPin(pos.coords.latitude, pos.coords.longitude);
       map.flyTo([pos.coords.latitude, pos.coords.longitude], Math.max(map.getZoom(), 18));
-      showToast('Pin dropped at your location');
+      showToast(t('toast_pin_dropped'));
     },
-    (err) => { showToast('Could not get location — check permissions'); },
+    (err) => { showToast(t('toast_location_error')); },
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 }
   );
 }
@@ -2166,11 +2560,17 @@ function updateGpsUI() {
   const pts = gpsPoints.length;
   const area = gpsHullPolygon ? estimateArea(gpsPoints) : 0;
   const areaStr = area > 4047 ? `${(area/4047).toFixed(2)} acres` : `${Math.round(area)} m²`;
+  const areaTag = area > 0 ? ' · ' + areaStr : '';
   const statusText = gpsTracking
-    ? `Tracking · ${pts} pts${area > 0 ? ' · ' + areaStr : ''}`
-    : pts > 0 ? `Stopped · ${pts} pts recorded` : 'Not tracking';
+    ? t('gps_tracking_status', {pts, area: areaTag})
+    : pts > 0 ? t('gps_stopped_status', {pts}) : t('gps_not_tracking');
 
-  if (sbBtn) { sbBtn.classList.toggle('tracking', gpsTracking); sbBtn.innerHTML = gpsTracking ? svgStop() + ' Stop GPS' : svgGPS() + ' GPS Tracking'; }
+  if (sbBtn) {
+    sbBtn.classList.toggle('tracking', gpsTracking);
+    sbBtn.innerHTML = gpsTracking
+      ? svgStop() + ' <span id="sb-gps-btn-label">' + t('stop_gps') + '</span>'
+      : svgGPS() + ' <span id="sb-gps-btn-label">' + t('gps_tracking') + '</span>';
+  }
   if (mobFab) { mobFab.classList.toggle('tracking', gpsTracking); }
   if (sbStatus) sbStatus.textContent = statusText;
   if (toolsStatus) toolsStatus.textContent = statusText;
@@ -2321,7 +2721,7 @@ function autoSave() {
 
 function saveSession() {
   autoSave();
-  showToast('Saved successfully');
+  showToast(t('toast_saved_session'));
 }
 
 function restoreSession() {
@@ -2347,7 +2747,7 @@ function restoreSession() {
 }
 
 function clearAll() {
-  if (!confirm('Clear all markers, GPS data, and form fields?')) return;
+  if (!confirm(t('confirm_clear'))) return;
   markers.forEach(m => map.removeLayer(m.leafletMarker));
   markers = []; nextId = 1;
   [gpsPolyline, gpsHullPolygon, gpsDot, gpsAccCircle].forEach(l => { if (l) map.removeLayer(l); });
@@ -2356,7 +2756,7 @@ function clearAll() {
   Object.keys(fieldIds).forEach(k => syncFields(k, k === 'date' ? new Date().toISOString().slice(0,10) : ''));
   renderMarkerLists();
   localStorage.removeItem('curbCutSurvey');
-  showToast('Cleared');
+  showToast(t('toast_cleared'));
 }
 
 // ============================================================
@@ -2377,52 +2777,71 @@ async function generatePDF() {
   const dept = getField('dept') || 'Department of Public Works';
   const deptaddr = getField('deptaddr') || '';
   const scope = getField('scope') || 'the surveyed area';
-  const today = new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
-  function addFooter() {
+  function addFooter(lc) {
+    const foot = strings[lc].pdf_footer;
     doc.setFontSize(9); doc.setTextColor(150,150,150);
     doc.text(`Page ${pageNum}`, W/2, H-24, { align:'center' });
-    doc.text('Curb Cut Survey Tool — ADA Accessibility Report', margin, H-24);
+    doc.text(foot, margin, H-24);
     pageNum++;
   }
 
-  // Cover letter
-  doc.setFillColor(15,31,61); doc.rect(0,0,W,56,'F');
-  doc.setTextColor(255,255,255); doc.setFontSize(20); doc.setFont('helvetica','bold');
-  doc.text('Curb Cut Survey — ADA Accessibility Report', margin, 36);
-  doc.setFillColor(29,184,126); doc.rect(0,56,W,4,'F');
+  // Write one full cover letter in the given language
+  function writeCoverLetter(lc) {
+    const tl = (key, vars) => {
+      let str = (strings[lc] || strings.en)[key] || strings.en[key] || key;
+      if (vars) Object.keys(vars).forEach(k => { str = str.replace(new RegExp('{' + k + '}', 'g'), vars[k]); });
+      return str;
+    };
+    const pluralS = lc === 'es'
+      ? (markers.length !== 1 ? 'es' : '')
+      : (markers.length !== 1 ? 's' : '');
+    const locale = lc === 'es' ? 'es-MX' : 'en-US';
+    const today = new Date(dateStr + 'T12:00:00').toLocaleDateString(locale, { year:'numeric', month:'long', day:'numeric' });
 
-  doc.setTextColor(30,41,59); doc.setFont('helvetica','normal');
-  let y = 90;
-  doc.setFontSize(11);
-  doc.text(today, margin, y); y += 18;
-  doc.text(surveyor, margin, y); y += 30;
-  if (dept) { doc.setFont('helvetica','bold'); doc.text(dept, margin, y); doc.setFont('helvetica','normal'); y += 16; }
-  if (deptaddr) { doc.text(deptaddr, margin, y); y += 16; }
-  y += 10;
-  doc.setFont('helvetica','bold'); doc.text(`Re: ADA Curb Cut Compliance Survey — ${city}`, margin, y); doc.setFont('helvetica','normal'); y += 20;
-  doc.setFontSize(10.5);
-  doc.text(`Dear ${dept ? dept + ' Officials' : 'Public Works Officials'},`, margin, y); y += 18;
+    doc.setFillColor(15,31,61); doc.rect(0,0,W,56,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(20); doc.setFont('helvetica','bold');
+    doc.text(tl('pdf_header'), margin, 36);
+    doc.setFillColor(29,184,126); doc.rect(0,56,W,4,'F');
 
-  const paras = [
-    `As someone with accessibility needs, I depend on safe, compliant pedestrian infrastructure to move through my community independently. The Americans with Disabilities Act of 1990 provides important protections in this regard — particularly Title II, which affirms that state and local governments must ensure their programs, services, and public rights-of-way are accessible to people with disabilities. It is from that personal experience, and with the hope of a more inclusive ${city}, that I write to bring several locations to your attention.`,
-    `As part of a careful accessibility survey I conducted in ${scope}, I identified ${markers.length} location${markers.length !== 1 ? 's' : ''} where curb cuts are either absent, severely deteriorated, or do not meet current accessibility standards — including the 2010 ADA Standards for Accessible Design (Section 406) and the Public Rights-of-Way Accessibility Guidelines (PROWAG).`,
-    `Missing or inadequate curb cuts create very real daily barriers for people who use wheelchairs, scooters, walkers, and other mobility aids, as well as for parents with strollers and individuals with visual impairments who rely on detectable warning surfaces. For many of us, these gaps in infrastructure mean having to travel significantly out of the way, enter traffic, or simply forgo trips that others take for granted.`,
-    `I respectfully ask that ${dept || 'your department'} review the attached survey documentation, which includes GPS-verified locations, photographs, and descriptions of each site. I hope your department will consider establishing a remediation timeline and prioritizing these locations for curb cut installation or repair in the next available capital improvement cycle.`,
-    `Thank you sincerely for your time and attention to this matter. I would welcome the opportunity to meet with department representatives to walk the survey area together and discuss these findings further. Please do not hesitate to contact me — I am happy to help in any way I can.`
-  ];
+    doc.setTextColor(30,41,59); doc.setFont('helvetica','normal');
+    let y = 90;
+    doc.setFontSize(11);
+    doc.text(today, margin, y); y += 18;
+    doc.text(surveyor, margin, y); y += 30;
+    if (dept) { doc.setFont('helvetica','bold'); doc.text(dept, margin, y); doc.setFont('helvetica','normal'); y += 16; }
+    if (deptaddr) { doc.text(deptaddr, margin, y); y += 16; }
+    y += 10;
+    doc.setFont('helvetica','bold'); doc.text(tl('pdf_re', {city}), margin, y); doc.setFont('helvetica','normal'); y += 20;
+    doc.setFontSize(10.5);
+    doc.text(dept ? tl('pdf_dear_dept', {dept}) : tl('pdf_dear_default'), margin, y); y += 18;
 
-  for (const para of paras) {
-    const lines = doc.splitTextToSize(para, contentW);
-    doc.text(lines, margin, y); y += lines.length * 15 + 12;
-    if (y > H - 100) { addFooter(); doc.addPage(); y = margin; }
+    const paras = [
+      tl('pdf_p1', {city}),
+      tl('pdf_p2', {scope, count: markers.length, s: pluralS}),
+      tl('pdf_p3'),
+      tl('pdf_p4', {dept: dept}),
+      tl('pdf_p5')
+    ];
+    for (const para of paras) {
+      const lines = doc.splitTextToSize(para, contentW);
+      doc.text(lines, margin, y); y += lines.length * 15 + 12;
+      if (y > H - 100) { addFooter(lc); doc.addPage(); y = margin; }
+    }
+    y += 10;
+    doc.text(tl('pdf_closing'), margin, y); y += 28;
+    doc.setFont('helvetica','bold'); doc.text(surveyor, margin, y); doc.setFont('helvetica','normal');
+    addFooter(lc);
   }
-  y += 10;
-  doc.text('Respectfully submitted,', margin, y); y += 28;
-  doc.setFont('helvetica','bold'); doc.text(surveyor, margin, y); doc.setFont('helvetica','normal');
-  addFooter();
 
-  // Map pages
+  // English cover letter
+  writeCoverLetter('en');
+
+  // Spanish cover letter (new page, accent color divider)
+  doc.addPage();
+  writeCoverLetter('es');
+
+  // Map pages (language-neutral, use current UI lang for labels)
   async function addMapPage(label) {
     doc.addPage();
     doc.setFillColor(15,31,61); doc.rect(0,0,W,40,'F');
@@ -2436,8 +2855,8 @@ async function generatePDF() {
       const imgData = canvas.toDataURL('image/jpeg', 0.85);
       const mapY = 55; const mapH = H - mapY - 60;
       doc.addImage(imgData, 'JPEG', margin, mapY, contentW, mapH);
-    } catch(e) { doc.setFontSize(11); doc.text('(Map screenshot unavailable)', margin, 80); }
-    addFooter();
+    } catch(e) { doc.setFontSize(11); doc.text(t('pdf_map_unavailable'), margin, 80); }
+    addFooter(lang);
   }
 
   async function flyToBoundsAndWait(latLngs) {
@@ -2447,27 +2866,28 @@ async function generatePDF() {
   }
 
   const savedCenter = map.getCenter(); const savedZoom = map.getZoom();
+  const pluralSCurrent = lang === 'es' ? (markers.length !== 1 ? 'es' : '') : (markers.length !== 1 ? 's' : '');
 
   if (markers.length === 0) {
-    await addMapPage('Survey Map');
+    await addMapPage(t('pdf_map_overview'));
   } else {
     const allLatLngs = markers.map(m => [m.lat, m.lng]);
     await flyToBoundsAndWait(allLatLngs);
     const overviewZoom = map.getZoom();
-    await addMapPage(`Survey Map — All ${markers.length} Location${markers.length !== 1 ? 's' : ''} (Overview)`);
+    await addMapPage(t('pdf_map_all', {count: markers.length, s: pluralSCurrent}));
     if (overviewZoom < 14 && markers.length > 1) {
       const CHUNK = 6;
       for (let i = 0; i < markers.length; i += CHUNK) {
         const chunk = markers.slice(i, i + CHUNK);
         const nums = chunk.map((m,j) => i+j+1);
         await flyToBoundsAndWait(chunk.map(m => [m.lat, m.lng]));
-        await addMapPage(`Survey Map — Locations ${nums[0]}–${nums[nums.length-1]}`);
+        await addMapPage(t('pdf_map_chunk', {a: nums[0], b: nums[nums.length-1]}));
       }
     }
   }
   map.setView(savedCenter, savedZoom);
 
-  // Location detail pages
+  // Location detail pages — bilingual labels (EN / ES)
   const colors = ['#2451b7','#1db87e','#f59e0b','#e84040','#8b5cf6','#06b6d4','#ec4899'];
   for (let i = 0; i < markers.length; i++) {
     const m = markers[i];
@@ -2476,20 +2896,22 @@ async function generatePDF() {
     const [r,g,b] = hexToRgb(color);
     doc.setFillColor(r,g,b); doc.rect(0,0,W,44,'F');
     doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text(`Location #${i+1}`, margin, 28);
+    doc.text(`${strings.en.pdf_loc_header.replace('{n}', i+1)}  /  ${strings.es.pdf_loc_header.replace('{n}', i+1)}`, margin, 28);
     doc.setTextColor(30,41,59); doc.setFont('helvetica','normal');
     let y = 64;
-    doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.text('Description:', margin, y); y += 16;
+    doc.setFontSize(11); doc.setFont('helvetica','bold');
+    doc.text(`${strings.en.pdf_desc_label}  /  ${strings.es.pdf_desc_label}`, margin, y); y += 16;
     doc.setFont('helvetica','normal');
-    const dlines = doc.splitTextToSize(m.desc || '(No description)', contentW);
+    const dlines = doc.splitTextToSize(m.desc || t('pdf_no_desc'), contentW);
     doc.text(dlines, margin, y); y += dlines.length * 14 + 12;
-    doc.setFont('helvetica','bold'); doc.text('GPS Coordinates:', margin, y); y += 16;
+    doc.setFont('helvetica','bold');
+    doc.text(`${strings.en.pdf_coords_label}  /  ${strings.es.pdf_coords_label}`, margin, y); y += 16;
     doc.setFont('helvetica','normal'); doc.text(`${m.lat.toFixed(6)}, ${m.lng.toFixed(6)}`, margin, y); y += 16;
     const gmapsUrl = `https://maps.google.com/?q=${m.lat},${m.lng}`;
-    doc.setTextColor(36,81,183); doc.textWithLink('View on Google Maps', margin, y, { url: gmapsUrl });
+    doc.setTextColor(36,81,183); doc.textWithLink(`${strings.en.pdf_gmaps}  /  ${strings.es.pdf_gmaps}`, margin, y, { url: gmapsUrl });
     doc.setTextColor(30,41,59); y += 20;
     if (m.photo) { try { doc.addImage(m.photo, 'JPEG', margin, y, Math.min(contentW,300), 200); y += 210; } catch(e) {} }
-    addFooter();
+    addFooter(lang);
   }
 
   if (markers.length > 0) {
@@ -2497,24 +2919,24 @@ async function generatePDF() {
     doc.setFillColor(15,31,61); doc.rect(0,0,W,40,'F');
     doc.setFillColor(29,184,126); doc.rect(0,40,W,3,'F');
     doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text('Quick Reference — All Locations', margin, 26);
+    doc.text(`${strings.en.pdf_quick_ref}  /  ${strings.es.pdf_quick_ref}`, margin, 26);
     doc.setTextColor(30,41,59); doc.setFont('helvetica','normal');
     let y = 60; doc.setFontSize(10);
     for (let i = 0; i < markers.length; i++) {
       const m = markers[i];
-      if (y > H-80) { addFooter(); doc.addPage(); y = margin; }
+      if (y > H-80) { addFooter(lang); doc.addPage(); y = margin; }
       doc.setFont('helvetica','bold'); doc.text(`#${i+1}`, margin, y);
       doc.setFont('helvetica','normal');
       doc.text((m.desc||'').slice(0,80), margin+24, y); y += 14;
       doc.setTextColor(100,116,139); doc.text(`   ${m.lat.toFixed(5)}, ${m.lng.toFixed(5)}`, margin, y);
       doc.setTextColor(30,41,59); y += 18;
     }
-    addFooter();
+    addFooter(lang);
   }
 
   const safeCity = city.replace(/[^a-z0-9]/gi,'-').toLowerCase();
   doc.save(`curb-cut-survey-${safeCity}-${dateStr}.pdf`);
-  showToast('PDF downloaded');
+  showToast(t('toast_pdf_downloaded'));
 }
 
 function hexToRgb(hex) {
@@ -2526,49 +2948,49 @@ function hexToRgb(hex) {
 // ============================================================
 const TOUR_KEY = 'curbCutTourDone';
 
-const tourSteps = [
-  {
-    title: 'Search for your neighborhood',
-    body: 'Type an address or intersection to jump to your survey area.',
-    target: () => isMobile ? null : document.getElementById('sb-search-input'),
-    mobileTarget: () => document.getElementById('mob-search-btn-hdr'),
-    arrow: 'top',
-    pad: 8
-  },
-  {
-    title: 'Switch to Place Marker mode',
-    body: 'Tap this button to enter placement mode — then tap anywhere on the map to drop a pin at a problem location.',
-    target: () => isMobile ? document.getElementById('mob-place-btn') : document.getElementById('place-btn'),
-    arrow: 'top',
-    pad: 8
-  },
-  {
-    title: 'Tap the map to mark locations',
-    body: 'Each pin gets an auto-detected address. Tap a pin to add a description or photo of the accessibility issue.',
-    target: () => document.getElementById('map'),
-    arrow: 'top',
-    pad: 16,
-    tipPosition: 'center'
-  },
-  {
-    title: 'Fill in your survey details',
-    body: isMobile
-      ? 'Swipe up the panel at the bottom and tap Survey to add your name, city, and department contact info.'
-      : 'Expand Survey Info in the sidebar to add your name, the city, and the department you\'re writing to.',
-    target: () => isMobile ? document.getElementById('bottom-sheet') : document.getElementById('acc-survey'),
-    arrow: isMobile ? 'bottom' : 'left',
-    pad: 8
-  },
-  {
-    title: 'Generate your PDF report',
-    body: 'When you\'re done surveying, tap "Generate PDF Report" to download a formal ADA complaint letter with your map, photos, and every location documented.',
-    target: () => isMobile ? null : document.querySelector('#acc-locs .pdf-btn'),
-    arrow: 'left',
-    pad: 8,
-    tipPosition: isMobile ? 'center' : null,
-    nextLabel: 'Done'
-  }
-];
+function getTourSteps() {
+  return [
+    {
+      title: t('tour1_title'),
+      body: t('tour1_body'),
+      target: () => isMobile ? null : document.getElementById('sb-search-input'),
+      mobileTarget: () => document.getElementById('mob-search-btn-hdr'),
+      arrow: 'top',
+      pad: 8
+    },
+    {
+      title: t('tour2_title'),
+      body: t('tour2_body'),
+      target: () => isMobile ? document.getElementById('mob-place-btn') : document.getElementById('place-btn'),
+      arrow: 'top',
+      pad: 8
+    },
+    {
+      title: t('tour3_title'),
+      body: t('tour3_body'),
+      target: () => document.getElementById('map'),
+      arrow: 'top',
+      pad: 16,
+      tipPosition: 'center'
+    },
+    {
+      title: t('tour4_title'),
+      body: isMobile ? t('tour4_body_mobile') : t('tour4_body_desktop'),
+      target: () => isMobile ? document.getElementById('bottom-sheet') : document.getElementById('acc-survey'),
+      arrow: isMobile ? 'bottom' : 'left',
+      pad: 8
+    },
+    {
+      title: t('tour5_title'),
+      body: t('tour5_body'),
+      target: () => isMobile ? null : document.querySelector('#acc-locs .pdf-btn'),
+      arrow: 'left',
+      pad: 8,
+      tipPosition: isMobile ? 'center' : null,
+      nextLabel: t('tour_done')
+    }
+  ];
+}
 
 let tourStep = 0;
 
@@ -2597,13 +3019,14 @@ function startTour() {
 
 function tourNext() {
   tourStep++;
-  if (tourStep >= tourSteps.length) { dismissTour(); return; }
+  if (tourStep >= getTourSteps().length) { dismissTour(); return; }
   renderTourStep();
 }
 
 function renderTourStep() {
-  const step = tourSteps[tourStep];
-  const totalSteps = tourSteps.length;
+  const steps = getTourSteps();
+  const step = steps[tourStep];
+  const totalSteps = steps.length;
 
   // Resolve target — fall back gracefully
   const target = (step.mobileTarget && isMobile ? step.mobileTarget() : null) || step.target();
@@ -2617,10 +3040,11 @@ function renderTourStep() {
   tip.style.display = 'block';
 
   // Update tip content
-  document.getElementById('onboard-tip-step').textContent = `Step ${tourStep + 1} of ${totalSteps}`;
+  document.getElementById('onboard-tip-step').textContent = t('tour_step_of', {a: tourStep + 1, b: totalSteps});
   document.getElementById('onboard-tip-title').textContent = step.title;
   document.getElementById('onboard-tip-body').textContent = typeof step.body === 'function' ? step.body() : step.body;
-  document.getElementById('onboard-tip-next').textContent = step.nextLabel || 'Next';
+  document.getElementById('onboard-tip-next').textContent = step.nextLabel || t('tour_next');
+  document.getElementById('onboard-tip-skip').textContent = t('tour_skip');
 
   // Dots
   const dotsEl = document.getElementById('onboard-tip-dots');
