@@ -1973,7 +1973,7 @@ const strings = {
     geocode_tap: 'tap to edit',
     geocode_looking: 'Looking up address…',
     // Confirm
-    confirm_clear: 'Clear all markers, GPS data, and form fields?',
+    confirm_clear: 'Clear all pinned locations?',
     alert_not_found: 'Location not found.',
     // Onboarding welcome screen 1
     ob_title: 'Curb Cut — ADA Survey Tool',
@@ -2014,7 +2014,7 @@ const strings = {
     tour5_title: 'Generate your PDF report',
     tour5_body: 'When you\'re done, tap "Generate PDF Report" to download a formal ADA complaint letter in both English and Spanish, with your map, photos, and every location documented.',
     tour6_title: 'Reset your survey',
-    tour6_body: 'Use the reset button in the top-right to clear all markers, GPS data, and form fields and start a new survey.',
+    tour6_body: 'Use the reset button in the top-right to clear all your pinned locations and start fresh. Your GPS path and survey details are kept.',
     tour7_title: 'Settings — language, display & feedback',
     tour7_body: 'Tap the Settings tab to switch between English and Spanish, choose Light, Dark, or High Contrast display mode — and use the "Report a Bug or Request a Feature" row to send us feedback directly.',
     // Lang toggle
@@ -2133,7 +2133,7 @@ const strings = {
     geocode_tap: 'toca para editar',
     geocode_looking: 'Buscando dirección…',
     // Confirm
-    confirm_clear: '¿Borrar todos los marcadores, datos GPS y campos del formulario?',
+    confirm_clear: '¿Borrar todas las ubicaciones marcadas?',
     alert_not_found: 'Ubicación no encontrada.',
     // Onboarding welcome screen 1
     ob_title: 'Curb Cut — Herramienta de Inspección ADA',
@@ -2174,7 +2174,7 @@ const strings = {
     tour5_title: 'Genera tu informe PDF',
     tour5_body: 'Cuando termines, toca "Generar Informe PDF" para descargar una carta formal de queja en inglés y español, con tu mapa, fotos y cada ubicación documentada.',
     tour6_title: 'Reinicia tu inspección',
-    tour6_body: 'Usa el botón de reinicio en la esquina superior derecha para borrar todos los marcadores, datos GPS y campos del formulario y comenzar una nueva inspección.',
+    tour6_body: 'Usa el botón de reinicio en la esquina superior derecha para borrar todas las ubicaciones marcadas y empezar de nuevo. Tu recorrido GPS y los datos de la inspección se conservan.',
     tour7_title: 'Ajustes — idioma, pantalla y comentarios',
     tour7_body: 'Toca la pestaña Ajustes para cambiar entre inglés y español, elegir el modo Claro, Oscuro o de Alto Contraste — y usa la fila "Reportar un error o solicitar función" para enviarnos tus comentarios directamente.',
     // Lang toggle
@@ -3092,12 +3092,8 @@ function clearAll() {
   if (!confirm(t('confirm_clear'))) return;
   markers.forEach(m => map.removeLayer(m.leafletMarker));
   markers = []; nextId = 1;
-  [gpsPolyline, gpsHullPolygon, gpsDot, gpsAccCircle].forEach(l => { if (l) map.removeLayer(l); });
-  gpsPolyline = null; gpsHullPolygon = null; gpsDot = null; gpsAccCircle = null;
-  stopGps(); gpsPoints = [];
-  Object.keys(fieldIds).forEach(k => syncFields(k, k === 'date' ? new Date().toISOString().slice(0,10) : ''));
   renderMarkerLists();
-  localStorage.removeItem('curbCutSurvey');
+  autoSave();
   showToast(t('toast_cleared'));
 }
 
