@@ -1759,7 +1759,7 @@ function initMap() {
 
     // Upward swipe on map: expand bottom sheet
     if (isMobile && dy < -50 && Math.abs(dy) > Math.abs(dx) * 1.5) {
-      const vh = window.innerHeight;
+      const vh = bsMaxHeight();
       const nextSnap = bsCurrentSnap <= BS_PEEK + 10 ? vh * 0.42
                      : bsCurrentSnap < vh * 0.6      ? vh
                      : null;
@@ -2213,6 +2213,12 @@ function estimateArea(points) {
 // ============================================================
 // BOTTOM SHEET
 // ============================================================
+function bsMaxHeight() {
+  const header = document.getElementById('header');
+  const headerH = header ? header.getBoundingClientRect().bottom : 0;
+  return window.innerHeight - headerH;
+}
+
 function initBottomSheet() {
   const bs = document.getElementById('bottom-sheet');
   const dragZone = document.getElementById('bs-drag-zone');
@@ -2232,7 +2238,7 @@ function initBottomSheet() {
   window.addEventListener('touchmove', (e) => {
     if (!bsDragging) return;
     const dy = bsDragStartY - e.touches[0].clientY;
-    const newH = Math.max(BS_PEEK, Math.min(window.innerHeight, bsDragStartH + dy));
+    const newH = Math.max(BS_PEEK, Math.min(bsMaxHeight(), bsDragStartH + dy));
     bs.style.height = newH + 'px';
     updateZoomControlPosition(newH);
   }, { passive: true });
@@ -2241,7 +2247,7 @@ function initBottomSheet() {
     if (!bsDragging) return;
     bsDragging = false;
     const curH = parseInt(bs.style.height) || BS_PEEK;
-    const vh = window.innerHeight;
+    const vh = bsMaxHeight();
     const snapPoints = [BS_PEEK, vh * 0.42, vh];
     const closest = snapPoints.reduce((a, b) => Math.abs(b - curH) < Math.abs(a - curH) ? b : a);
     snapBottomSheet(closest);
@@ -2258,7 +2264,7 @@ function snapBottomSheet(h) {
 
 function updateZoomControlPosition(sheetHeight) {
   if (!isMobile) return;
-  const full = window.innerHeight;
+  const full = bsMaxHeight();
   const hidden = sheetHeight >= full - 2;
   const offset = sheetHeight + 14;
 
@@ -2279,7 +2285,7 @@ function switchBsTab(idx) {
   bsActiveTab = idx;
   document.querySelectorAll('.bs-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   document.querySelectorAll('.bs-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
-  if (bsCurrentSnap <= BS_PEEK + 10) snapBottomSheet(window.innerHeight * 0.42);
+  if (bsCurrentSnap <= BS_PEEK + 10) snapBottomSheet(bsMaxHeight() * 0.42);
 }
 
 // ============================================================
