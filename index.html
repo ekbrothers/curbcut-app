@@ -244,11 +244,18 @@ input, textarea, select { font-family: inherit; }
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 #map {
   position: absolute;
   inset: 0;
+  bottom: 88px; /* always sits above the tab bar */
+}
+
+@media (min-width: 640px) {
+  #map { bottom: 0; }
 }
 
 /* Override leaflet zoom control */
@@ -305,7 +312,7 @@ body.high-contrast .leaflet-tile-pane { filter: none !important; }
 #map-fab-group {
   position: absolute;
   right: 14px;
-  bottom: 90px; /* fallback: peek (76) + 14px gap; overridden by JS on mobile */
+  bottom: 102px; /* fallback: peek (88) + 14px gap; overridden by JS on mobile */
   z-index: 500;
   display: flex;
   flex-direction: column;
@@ -866,7 +873,7 @@ body.place-mode .pin-head {
   overflow: hidden;
   touch-action: none;
   transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-  height: 76px;
+  height: 88px;
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
@@ -901,13 +908,13 @@ body.place-mode .pin-head {
 }
 .bs-tab {
   flex: 1;
-  padding: 10px 4px 12px;
+  padding: 10px 4px 14px;
   text-align: center;
   font-weight: 600;
   color: var(--text3);
   border-bottom: 3px solid transparent;
   transition: color 0.15s, border-color 0.15s;
-  min-height: 56px;
+  min-height: 68px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2285,7 +2292,7 @@ let gpsHullPolygon = null;
 let lastGpsPos = null;
 
 // Bottom sheet
-const BS_PEEK = 76; // handle (20px) + tab bar (56px) — always visible
+const BS_PEEK = 88; // handle (20px) + tab bar (68px) — always visible
 let bsCurrentSnap = BS_PEEK;
 let bsDragStartY = 0;
 let bsDragStartH = 0;
@@ -2364,9 +2371,7 @@ function initMap() {
     // Upward swipe on map: expand bottom sheet
     if (isMobile && dy < -50 && Math.abs(dy) > Math.abs(dx) * 1.5) {
       const vh = bsMaxHeight();
-      const nextSnap = bsCurrentSnap <= BS_PEEK + 10 ? vh * 0.5
-                     : bsCurrentSnap < vh * 0.6    ? vh
-                     : null;
+      const nextSnap = bsCurrentSnap <= BS_PEEK + 10 ? vh : null;
       if (nextSnap) { snapBottomSheet(nextSnap); return; }
     }
 
@@ -2863,7 +2868,7 @@ function initBottomSheet() {
     bsDragging = false;
     const curH = parseInt(bs.style.height) || BS_PEEK;
     const vh = bsMaxHeight();
-    const snapPoints = [BS_PEEK, vh * 0.5, vh];
+    const snapPoints = [BS_PEEK, vh];
     const closest = snapPoints.reduce((a, b) => Math.abs(b - curH) < Math.abs(a - curH) ? b : a);
     snapBottomSheet(closest);
   });
@@ -2899,7 +2904,7 @@ function switchBsTab(idx) {
   bsActiveTab = idx;
   document.querySelectorAll('.bs-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   document.querySelectorAll('.bs-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
-  if (bsCurrentSnap <= BS_PEEK + 10) snapBottomSheet(bsMaxHeight() * 0.5);
+  if (bsCurrentSnap <= BS_PEEK + 10) snapBottomSheet(bsMaxHeight());
 }
 
 // ============================================================
