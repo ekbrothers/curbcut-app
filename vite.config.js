@@ -5,7 +5,15 @@ export default defineConfig({
   build: {
     outDir: 'dist'
   },
-  define: {
-    '__GITHUB_TOKEN__': JSON.stringify(process.env.GITHUB_TOKEN || '')
-  }
+  plugins: [
+    {
+      name: 'inject-env-into-html',
+      transformIndexHtml(html) {
+        return html.replace(
+          '__GITHUB_TOKEN__',
+          JSON.stringify(process.env.GITHUB_TOKEN || '')
+        )
+      }
+    }
+  ]
 })
