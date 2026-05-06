@@ -300,14 +300,7 @@ body.dark .leaflet-tile-pane {
 /* High contrast keeps tiles full-colour for readability */
 body.high-contrast .leaflet-tile-pane { filter: none !important; }
 
-/* Attribution */
-.leaflet-control-attribution {
-  background: rgba(255,255,255,0.75) !important;
-  backdrop-filter: blur(6px);
-  border-radius: 6px 0 0 0 !important;
-  font-size: 9px !important;
-  padding: 2px 6px !important;
-}
+
 
 /* ============================================================
    MAP FLOATING BUTTONS
@@ -2387,7 +2380,7 @@ function initMap() {
     zoomControl: false,
     center: [39.5, -98.35],
     zoom: 4,
-    attributionControl: true
+    attributionControl: false
   });
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
