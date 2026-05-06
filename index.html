@@ -316,27 +316,31 @@ body.high-contrast .leaflet-tile-pane { filter: none !important; }
 }
 
 .map-fab {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
   background: var(--surface);
   box-shadow: var(--shadow);
   border: none;
   color: var(--text1);
-  font-size: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: box-shadow 0.15s, transform 0.1s;
-  min-width: 56px;
-  min-height: 56px;
+  min-width: 64px;
+  min-height: 64px;
 }
-.map-fab svg { width: 22px; height: 22px; }
+.map-fab svg { width: 26px; height: 26px; }
 .map-fab:active { transform: scale(0.94); box-shadow: var(--shadow-sm); }
 .map-fab.tracking {
   background: var(--red);
   color: #fff;
 }
+#mob-pin-here-fab {
+  background: var(--green);
+  color: #fff;
+}
+#mob-pin-here-fab:active { background: var(--green-dk); }
 
 /* ============================================================
    MOBILE SEARCH BAR
