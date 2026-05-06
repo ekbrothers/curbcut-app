@@ -1696,23 +1696,17 @@ body.place-mode .pin-head {
           <div class="bs-inner" style="display:flex;flex-direction:column;gap:4px;">
             <div class="settings-label" id="lbl-settings-section">Preferences</div>
 
-            <!-- Language row -->
-            <div class="settings-row" onclick="setLang(lang==='en'?'es':'en')">
-              <div class="settings-row-icon">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="10" cy="10" r="8.5"/>
-                  <path d="M10 1.5C10 1.5 7 5 7 10C7 15 10 18.5 10 18.5"/>
-                  <path d="M10 1.5C10 1.5 13 5 13 10C13 15 10 18.5 10 18.5"/>
-                  <line x1="1.5" y1="10" x2="18.5" y2="10"/>
-                  <line x1="2.5" y1="6.5" x2="17.5" y2="6.5"/>
-                  <line x1="2.5" y1="13.5" x2="17.5" y2="13.5"/>
-                </svg>
-              </div>
-              <div class="settings-row-text">
-                <div class="settings-row-title" id="lbl-lang-title">Language</div>
-                <div class="settings-row-sub" id="lbl-lang-sub">English</div>
-              </div>
-              <div class="settings-row-value" id="lbl-lang-value">EN</div>
+            <!-- Language selector -->
+            <div class="settings-label" id="lbl-lang-section">Language</div>
+            <div class="mode-selector">
+              <button class="mode-option active" id="lang-opt-en" onclick="setLang('en')">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.5"/><path d="M10 1.5C10 1.5 7 5 7 10C7 15 10 18.5 10 18.5"/><path d="M10 1.5C10 1.5 13 5 13 10C13 15 10 18.5 10 18.5"/><line x1="1.5" y1="10" x2="18.5" y2="10"/></svg>
+                <span>English</span>
+              </button>
+              <button class="mode-option" id="lang-opt-es" onclick="setLang('es')">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.5"/><path d="M10 1.5C10 1.5 7 5 7 10C7 15 10 18.5 10 18.5"/><path d="M10 1.5C10 1.5 13 5 13 10C13 15 10 18.5 10 18.5"/><line x1="1.5" y1="10" x2="18.5" y2="10"/></svg>
+                <span>Español</span>
+              </button>
             </div>
 
             <!-- Display mode selector -->
@@ -1743,7 +1737,7 @@ body.place-mode .pin-head {
               </div>
               <div class="settings-row-text">
                 <div class="settings-row-title" id="lbl-feedback-title">Report a Bug or Request a Feature</div>
-                <div class="settings-row-sub" id="lbl-feedback-sub">Opens a GitHub issue</div>
+                <div class="settings-row-sub" id="lbl-feedback-sub">Help us improve the app</div>
               </div>
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 2l5 5-5 5"/></svg>
             </div>
@@ -1919,6 +1913,7 @@ const strings = {
     tab_survey: 'Survey',
     tab_tools: 'Settings',
     settings_section: 'Preferences',
+    lang_section: 'Language',
     lang_title: 'Language',
     lang_sub_en: 'English',
     lang_sub_es: 'Spanish',
@@ -2010,17 +2005,19 @@ const strings = {
     tour_next: 'Next',
     tour_done: 'Done',
     tour_step_of: 'Step {a} of {b}',
-    tour1_title: 'Search for your neighborhood',
-    tour1_body: 'Type an address or intersection to jump to your survey area.',
-    tour2_title: 'Switch to Place Marker mode',
-    tour2_body: 'Tap this button to enter placement mode — then tap anywhere on the map to drop a pin at a problem location.',
-    tour3_title: 'Mark locations on the map',
-    tour3_body: 'Tap the map to drop a pin, or use "Drop Pin at My Location" in the Tools tab to pin your exact GPS position.',
+    tour1_title: 'Search for your area',
+    tour1_body: 'Type an address or intersection to jump to your survey neighborhood.',
+    tour2_title: 'Place pins on problem spots',
+    tour2_body: 'Tap "Place Pin" then tap the map to drop a pin — or use the GPS button on the map to pin your exact current location.',
+    tour3_title: 'Describe each location',
+    tour3_body: 'Tap any pin to open it. Add a description of the accessibility issue and attach a photo from your camera.',
     tour4_title: 'Fill in your survey details',
-    tour4_body_mobile: 'Swipe up the bottom panel and tap Survey to add your name, city, and department contact info.',
+    tour4_body_mobile: 'Swipe up from the tab bar and tap Survey to add your name, city, and the department you\'re writing to.',
     tour4_body_desktop: 'Expand Survey Info in the sidebar to add your name, the city, and the department you\'re writing to.',
     tour5_title: 'Generate your PDF report',
-    tour5_body: 'When you\'re done, tap "Generate PDF Report" to download a formal ADA complaint letter with your map, photos, and every location documented.',
+    tour5_body: 'When you\'re done, tap "Generate PDF Report" to download a formal ADA complaint letter in both English and Spanish, with your map, photos, and every location documented.',
+    tour6_title: 'Language & display settings',
+    tour6_body: 'Tap the Settings tab to switch languages, choose Light, Dark, or High Contrast mode, or report a bug.',
     // Lang toggle
     lang_toggle: 'ES',
     // PDF
@@ -2074,6 +2071,7 @@ const strings = {
     tab_survey: 'Inspección',
     tab_tools: 'Ajustes',
     settings_section: 'Preferencias',
+    lang_section: 'Idioma',
     lang_title: 'Idioma',
     lang_sub_en: 'Inglés',
     lang_sub_es: 'Español',
@@ -2165,17 +2163,19 @@ const strings = {
     tour_next: 'Siguiente',
     tour_done: 'Listo',
     tour_step_of: 'Paso {a} de {b}',
-    tour1_title: 'Busca tu vecindario',
-    tour1_body: 'Escribe una dirección o intersección para navegar a tu área de inspección.',
-    tour2_title: 'Cambia al modo Colocar Marcador',
-    tour2_body: 'Toca este botón para entrar al modo de colocación — luego toca el mapa para colocar un pin en una ubicación problemática.',
-    tour3_title: 'Marca ubicaciones en el mapa',
-    tour3_body: 'Toca el mapa para colocar un pin, o usa "Marcar Mi Ubicación Actual" en la pestaña Herramientas para marcar tu posición GPS exacta.',
+    tour1_title: 'Busca tu área',
+    tour1_body: 'Escribe una dirección o intersección para navegar a tu vecindario de inspección.',
+    tour2_title: 'Coloca pines en los lugares problemáticos',
+    tour2_body: 'Toca "Marcar" y luego el mapa para colocar un pin — o usa el botón GPS en el mapa para marcar tu ubicación exacta.',
+    tour3_title: 'Describe cada ubicación',
+    tour3_body: 'Toca cualquier pin para abrirlo. Agrega una descripción del problema de accesibilidad y adjunta una foto desde tu cámara.',
     tour4_title: 'Completa los detalles de tu inspección',
-    tour4_body_mobile: 'Desliza hacia arriba el panel inferior y toca Inspección para agregar tu nombre, ciudad e información de contacto del departamento.',
+    tour4_body_mobile: 'Desliza hacia arriba desde la barra de pestañas y toca Inspección para agregar tu nombre, ciudad y el departamento al que escribes.',
     tour4_body_desktop: 'Expande Información de la Inspección en la barra lateral para agregar tu nombre, la ciudad y el departamento al que escribes.',
     tour5_title: 'Genera tu informe PDF',
-    tour5_body: 'Cuando termines, toca "Generar Informe PDF" para descargar una carta formal de queja con tu mapa, fotos y cada ubicación documentada.',
+    tour5_body: 'Cuando termines, toca "Generar Informe PDF" para descargar una carta formal de queja en inglés y español, con tu mapa, fotos y cada ubicación documentada.',
+    tour6_title: 'Configuración de idioma y pantalla',
+    tour6_body: 'Toca la pestaña Ajustes para cambiar el idioma, elegir el modo Claro, Oscuro o de Alto Contraste, o reportar un error.',
     // Lang toggle
     lang_toggle: 'EN',
     // PDF
@@ -2309,9 +2309,12 @@ function applyLang() {
 
   // Settings tab rows
   setText('lbl-settings-section', 'settings_section');
-  setText('lbl-lang-title', 'lang_title');
-  setText('lbl-lang-sub', lang === 'en' ? 'lang_sub_en' : 'lang_sub_es');
-  setText('lbl-lang-value', lang === 'en' ? 'lang_value_en' : 'lang_value_es');
+  setText('lbl-lang-section', 'lang_section');
+  // Language selector — highlight active option
+  const enOpt = document.getElementById('lang-opt-en');
+  const esOpt = document.getElementById('lang-opt-es');
+  if (enOpt) enOpt.classList.toggle('active', lang === 'en');
+  if (esOpt) esOpt.classList.toggle('active', lang === 'es');
   setText('lbl-display-section', 'display_section');
   setText('lbl-mode-light', 'mode_light');
   setText('lbl-mode-dark', 'mode_dark');
@@ -3260,6 +3263,14 @@ function getTourSteps() {
       arrow: 'left',
       pad: 8,
       tipPosition: isMobile ? 'center' : null,
+    },
+    {
+      title: t('tour6_title'),
+      body: t('tour6_body'),
+      target: () => isMobile ? document.querySelector('.bs-tab[data-tab="2"]') : null,
+      arrow: 'top',
+      pad: 8,
+      tipPosition: isMobile ? null : 'center',
       nextLabel: t('tour_done')
     }
   ];
