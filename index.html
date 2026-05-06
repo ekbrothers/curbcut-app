@@ -64,7 +64,11 @@ body.dark {
   --shadow-sm: 0 1px 4px rgba(0,0,0,0.3);
   --shadow:    0 4px 20px rgba(0,0,0,0.4);
   --shadow-lg: 0 12px 40px rgba(0,0,0,0.5);
+  background: #1a1f2e;
 }
+/* Kill the white peek-through corners on bottom sheet and map container */
+body.dark #app-root,
+body.dark #map-container { background: #1a1f2e; }
 
 /* High-contrast accessibility mode — WCAG AA/AAA compliant */
 body.high-contrast {
@@ -274,13 +278,17 @@ input, textarea, select { font-family: inherit; }
   border-bottom: 1px solid var(--border) !important;
 }
 
-/* Move zoom control to bottom-right on mobile (bottom offset set dynamically by JS) */
+/* Zoom control sits top-right on mobile, just below the header */
 @media (max-width: 639px) {
   .leaflet-top.leaflet-right {
-    top: auto !important;
-    bottom: 114px !important; /* fallback: peek height (100) + 14px gap */
+    top: 14px !important;
+    right: 14px !important;
   }
 }
+
+/* Map tiles always stay full-colour — never inverted or filtered */
+body.dark .leaflet-tile-pane,
+body.high-contrast .leaflet-tile-pane { filter: none !important; }
 
 /* Attribution */
 .leaflet-control-attribution {
@@ -296,7 +304,7 @@ input, textarea, select { font-family: inherit; }
    ============================================================ */
 #map-fab-group {
   position: absolute;
-  left: 14px;
+  right: 14px;
   bottom: 114px; /* fallback: peek (100) + 14px gap; overridden by JS on mobile */
   z-index: 500;
   display: flex;
@@ -1194,35 +1202,39 @@ body.place-mode .pin-head {
   color: var(--blue);
   letter-spacing: 0.04em;
 }
-/* Toggle switch */
-.settings-toggle {
-  width: 42px;
-  height: 24px;
-  border-radius: 12px;
-  background: var(--surf3);
+/* Mode selector (three mutually exclusive options) */
+.mode-selector {
+  display: flex;
+  gap: 0;
+  border-radius: 10px;
+  overflow: hidden;
   border: 1.5px solid var(--border);
-  position: relative;
-  transition: background 0.2s, border-color 0.2s;
-  flex-shrink: 0;
+  margin-bottom: 8px;
 }
-.settings-toggle.on {
-  background: var(--green);
-  border-color: var(--green);
+.mode-option {
+  flex: 1;
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  background: var(--surf2);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  border-right: 1.5px solid var(--border);
 }
-.settings-toggle-thumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
-  transition: transform 0.2s cubic-bezier(0.34,1.2,0.64,1);
+.mode-option:last-child { border-right: none; }
+.mode-option.active {
+  background: var(--navy);
+  color: #fff;
 }
-.settings-toggle.on .settings-toggle-thumb {
-  transform: translateX(18px);
-}
+.mode-option svg { flex-shrink: 0; }
 
 /* ============================================================
    UTILITY
@@ -1692,38 +1704,21 @@ body.place-mode .pin-head {
               <div class="settings-row-value" id="lbl-lang-value">EN</div>
             </div>
 
-            <!-- High contrast row -->
-            <div class="settings-row" onclick="toggleHighContrast()">
-              <div class="settings-row-icon">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="10" cy="10" r="8.5"/>
-                  <path d="M10 1.5v17" stroke-width="1.5"/>
-                  <path d="M10 1.5A8.5 8.5 0 0 1 10 18.5z" fill="currentColor" stroke="none"/>
-                </svg>
-              </div>
-              <div class="settings-row-text">
-                <div class="settings-row-title" id="lbl-hc-title">High Contrast</div>
-                <div class="settings-row-sub" id="lbl-hc-sub">Off</div>
-              </div>
-              <div class="settings-toggle" id="high-contrast-toggle">
-                <div class="settings-toggle-thumb"></div>
-              </div>
-            </div>
-
-            <!-- Dark mode row -->
-            <div class="settings-row" onclick="toggleDarkMode()">
-              <div class="settings-row-icon">
-                <svg id="dark-mode-icon" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17 13A8 8 0 0 1 7 3a8 8 0 1 0 10 10z"/>
-                </svg>
-              </div>
-              <div class="settings-row-text">
-                <div class="settings-row-title" id="lbl-dark-title">Dark Mode</div>
-                <div class="settings-row-sub" id="lbl-dark-sub">Off</div>
-              </div>
-              <div class="settings-toggle" id="dark-mode-toggle">
-                <div class="settings-toggle-thumb"></div>
-              </div>
+            <!-- Display mode selector -->
+            <div class="settings-label" id="lbl-display-section" style="margin-top:8px">Display</div>
+            <div class="mode-selector">
+              <button class="mode-option active" id="mode-opt-light" onclick="setDisplayMode('light')">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="3.5"/><path d="M10 1v2M10 17v2M1 10h2M17 10h2M3.5 3.5l1.4 1.4M15.1 15.1l1.4 1.4M3.5 16.5l1.4-1.4M15.1 4.9l1.4-1.4"/></svg>
+                <span id="lbl-mode-light">Light</span>
+              </button>
+              <button class="mode-option" id="mode-opt-dark" onclick="setDisplayMode('dark')">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 13A8 8 0 0 1 7 3a8 8 0 1 0 10 10z"/></svg>
+                <span id="lbl-mode-dark">Dark</span>
+              </button>
+              <button class="mode-option" id="mode-opt-hc" onclick="setDisplayMode('hc')">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="8.5"/><path d="M10 1.5v17"/><path d="M10 1.5A8.5 8.5 0 0 1 10 18.5z" fill="currentColor" stroke="none"/></svg>
+                <span id="lbl-mode-hc">High Contrast</span>
+              </button>
             </div>
 
           </div>
@@ -1872,12 +1867,10 @@ const strings = {
     lang_sub_es: 'Spanish',
     lang_value_en: 'EN',
     lang_value_es: 'ES',
-    dark_title: 'Dark Mode',
-    dark_on: 'On',
-    dark_off: 'Off',
-    hc_title: 'High Contrast',
-    hc_on: 'On',
-    hc_off: 'Off',
+    display_section: 'Display',
+    mode_light: 'Light',
+    mode_dark: 'Dark',
+    mode_hc: 'High Contrast',
     // Survey form
     section_survey: 'Survey Info',
     section_locations: 'Marked Locations',
@@ -2029,12 +2022,10 @@ const strings = {
     lang_sub_es: 'Español',
     lang_value_en: 'EN',
     lang_value_es: 'ES',
-    dark_title: 'Modo Oscuro',
-    dark_on: 'Activado',
-    dark_off: 'Desactivado',
-    hc_title: 'Alto Contraste',
-    hc_on: 'Activado',
-    hc_off: 'Desactivado',
+    display_section: 'Pantalla',
+    mode_light: 'Claro',
+    mode_dark: 'Oscuro',
+    mode_hc: 'Alto Contraste',
     // Survey form
     section_survey: 'Información de la Inspección',
     section_locations: 'Ubicaciones Marcadas',
@@ -2168,40 +2159,23 @@ function setLang(l) {
   applyLang();
 }
 
-let darkMode = localStorage.getItem('curbCutDark') === '1';
-let highContrast = localStorage.getItem('curbCutHC') === '1';
+// displayMode: 'light' | 'dark' | 'hc'
+let displayMode = localStorage.getItem('curbCutMode') || 'light';
 
-function toggleDarkMode() {
-  darkMode = !darkMode;
-  localStorage.setItem('curbCutDark', darkMode ? '1' : '0');
-  applyDarkMode();
-  applyLang();
-}
-
-function toggleHighContrast() {
-  highContrast = !highContrast;
-  localStorage.setItem('curbCutHC', highContrast ? '1' : '0');
+function setDisplayMode(m) {
+  displayMode = m;
+  localStorage.setItem('curbCutMode', m);
   applyDarkMode();
   applyLang();
 }
 
 function applyDarkMode() {
-  document.body.classList.toggle('dark', darkMode);
-  document.body.classList.toggle('high-contrast', highContrast);
-  const hcToggle = document.getElementById('high-contrast-toggle');
-  if (hcToggle) hcToggle.classList.toggle('on', highContrast);
-  const toggle = document.getElementById('dark-mode-toggle');
-  if (toggle) toggle.classList.toggle('on', darkMode);
-  const icon = document.getElementById('dark-mode-icon');
-  if (icon) {
-    if (darkMode) {
-      // Sun icon when dark mode is on
-      icon.innerHTML = '<circle cx="10" cy="10" r="3.5"/><path d="M10 1v2M10 17v2M1 10h2M17 10h2M3.5 3.5l1.4 1.4M15.1 15.1l1.4 1.4M3.5 16.5l1.4-1.4M15.1 4.9l1.4-1.4"/>';
-    } else {
-      // Moon icon when dark mode is off
-      icon.innerHTML = '<path d="M17 13A8 8 0 0 1 7 3a8 8 0 1 0 10 10z"/>';
-    }
-  }
+  document.body.classList.toggle('dark', displayMode === 'dark');
+  document.body.classList.toggle('high-contrast', displayMode === 'hc');
+  ['light','dark','hc'].forEach(m => {
+    const el = document.getElementById('mode-opt-' + m);
+    if (el) el.classList.toggle('active', displayMode === m);
+  });
 }
 
 function applyLang() {
@@ -2279,10 +2253,10 @@ function applyLang() {
   setText('lbl-lang-title', 'lang_title');
   setText('lbl-lang-sub', lang === 'en' ? 'lang_sub_en' : 'lang_sub_es');
   setText('lbl-lang-value', lang === 'en' ? 'lang_value_en' : 'lang_value_es');
-  setText('lbl-hc-title', 'hc_title');
-  setText('lbl-hc-sub', highContrast ? 'hc_on' : 'hc_off');
-  setText('lbl-dark-title', 'dark_title');
-  setText('lbl-dark-sub', darkMode ? 'dark_on' : 'dark_off');
+  setText('lbl-display-section', 'display_section');
+  setText('lbl-mode-light', 'mode_light');
+  setText('lbl-mode-dark', 'mode_dark');
+  setText('lbl-mode-hc', 'mode_hc');
 
   // Re-render marker lists (picks up edit/view/delete labels)
   renderMarkerLists();
@@ -2364,7 +2338,7 @@ function initMap() {
 
   map.on('click', (e) => {
     closeMobSearch();
-    if (isMobile) snapBottomSheet(BS_PEEK);
+    if (isMobile) snapBottomSheet(0);
     if (mode === 'place') {
       const now = Date.now();
       if (now - lastPlacedTime < 600) return;
@@ -2390,8 +2364,8 @@ function initMap() {
     // Upward swipe on map: expand bottom sheet
     if (isMobile && dy < -50 && Math.abs(dy) > Math.abs(dx) * 1.5) {
       const vh = bsMaxHeight();
-      const nextSnap = bsCurrentSnap <= BS_PEEK + 10 ? vh * 0.42
-                     : bsCurrentSnap < vh * 0.6      ? vh
+      const nextSnap = bsCurrentSnap < vh * 0.2 ? vh * 0.42
+                     : bsCurrentSnap < vh * 0.6  ? vh
                      : null;
       if (nextSnap) { snapBottomSheet(nextSnap); return; }
     }
@@ -2404,7 +2378,7 @@ function initMap() {
     const rect = mapEl.getBoundingClientRect();
     const latlng = map.containerPointToLatLng(L.point(t.clientX - rect.left, t.clientY - rect.top));
     dropPin(latlng.lat, latlng.lng);
-    if (isMobile) snapBottomSheet(BS_PEEK);
+    if (isMobile) snapBottomSheet(0);
   }, { passive: true });
 }
 
@@ -2647,7 +2621,7 @@ function esc(s) {
 
 function flyTo(lat, lng) {
   map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
-  if (isMobile) snapBottomSheet(BS_PEEK);
+  if (isMobile) snapBottomSheet(0);
 }
 
 // ============================================================
@@ -2866,21 +2840,20 @@ function initBottomSheet() {
   const dragZone = document.getElementById('bs-drag-zone');
   if (window.innerWidth < 640) {
     bs.style.display = 'flex';
-    snapBottomSheet(BS_PEEK);
+    snapBottomSheet(0); // start closed
   }
 
   dragZone.addEventListener('touchstart', (e) => {
     bsDragging = true;
     bsDragStartY = e.touches[0].clientY;
-    bsDragStartH = parseInt(bs.style.height) || BS_PEEK;
+    bsDragStartH = parseInt(bs.style.height) || 0;
     bs.style.transition = 'none';
   }, { passive: true });
 
-  // touchmove and touchend on window so drag continues even if finger leaves the zone
   window.addEventListener('touchmove', (e) => {
     if (!bsDragging) return;
     const dy = bsDragStartY - e.touches[0].clientY;
-    const newH = Math.max(BS_PEEK, Math.min(bsMaxHeight(), bsDragStartH + dy));
+    const newH = Math.max(0, Math.min(bsMaxHeight(), bsDragStartH + dy));
     bs.style.height = newH + 'px';
     updateZoomControlPosition(newH);
   }, { passive: true });
@@ -2888,9 +2861,9 @@ function initBottomSheet() {
   window.addEventListener('touchend', () => {
     if (!bsDragging) return;
     bsDragging = false;
-    const curH = parseInt(bs.style.height) || BS_PEEK;
+    const curH = parseInt(bs.style.height) || 0;
     const vh = bsMaxHeight();
-    const snapPoints = [BS_PEEK, vh * 0.42, vh];
+    const snapPoints = [0, vh * 0.42, vh];
     const closest = snapPoints.reduce((a, b) => Math.abs(b - curH) < Math.abs(a - curH) ? b : a);
     snapBottomSheet(closest);
   });
@@ -2901,6 +2874,8 @@ function snapBottomSheet(h) {
   bs.style.transition = 'height 0.32s cubic-bezier(0.4, 0, 0.2, 1)';
   bs.style.height = h + 'px';
   bsCurrentSnap = h;
+  // Hide overflow so tab content doesn't peek when nearly closed
+  bs.style.overflow = h < 10 ? 'hidden' : 'hidden';
   updateZoomControlPosition(h);
 }
 
@@ -2910,12 +2885,11 @@ function updateZoomControlPosition(sheetHeight) {
   const hidden = sheetHeight >= full - 2;
   const offset = sheetHeight + 14;
 
-  const zoomEl = document.querySelector('.leaflet-bottom.leaflet-right');
-  if (zoomEl) {
-    zoomEl.style.display = hidden ? 'none' : '';
-    if (!hidden) zoomEl.style.bottom = offset + 'px';
-  }
+  // Zoom stays top-right fixed — only hide it when sheet is full-screen
+  const zoomEl = document.querySelector('.leaflet-top.leaflet-right');
+  if (zoomEl) zoomEl.style.display = hidden ? 'none' : '';
 
+  // FABs track above the sheet bottom
   const fabGroup = document.getElementById('map-fab-group');
   if (fabGroup) {
     fabGroup.style.display = hidden ? 'none' : '';
@@ -2927,7 +2901,7 @@ function switchBsTab(idx) {
   bsActiveTab = idx;
   document.querySelectorAll('.bs-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   document.querySelectorAll('.bs-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
-  if (bsCurrentSnap <= BS_PEEK + 10) snapBottomSheet(bsMaxHeight() * 0.42);
+  if (bsCurrentSnap < bsMaxHeight() * 0.2) snapBottomSheet(bsMaxHeight() * 0.42);
 }
 
 // ============================================================
