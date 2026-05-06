@@ -247,7 +247,7 @@ input, textarea, select { font-family: inherit; }
 #map-fab-group {
   position: absolute;
   left: 14px;
-  bottom: 14px;
+  bottom: 114px; /* fallback: peek (100) + 14px gap; overridden by JS on mobile */
   z-index: 500;
   display: flex;
   flex-direction: column;
@@ -819,6 +819,14 @@ body.place-mode .pin-head {
   justify-content: center;
   cursor: grab;
   flex-shrink: 0;
+}
+
+/* Make the full top strip (handle + tabs) draggable */
+#bs-drag-zone {
+  flex-shrink: 0;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
 }
 #bs-handle {
   width: 38px;
@@ -1455,9 +1463,10 @@ body.place-mode .pin-head {
 
     <!-- Bottom sheet -->
     <div id="bottom-sheet">
-      <div id="bs-handle-area">
-        <div id="bs-handle"></div>
-      </div>
+      <div id="bs-drag-zone">
+        <div id="bs-handle-area">
+          <div id="bs-handle"></div>
+        </div>
       <div id="bs-tabs">
         <button class="bs-tab active" data-tab="0" onclick="switchBsTab(0)">
           <span class="bs-tab-icon">
@@ -1478,6 +1487,7 @@ body.place-mode .pin-head {
           <span class="bs-tab-label">Tools</span>
         </button>
       </div>
+      </div><!-- /bs-drag-zone -->
       <div id="bs-content">
 
         <!-- Locations tab -->
@@ -2205,20 +2215,21 @@ function estimateArea(points) {
 // ============================================================
 function initBottomSheet() {
   const bs = document.getElementById('bottom-sheet');
-  const handle = document.getElementById('bs-handle-area');
+  const dragZone = document.getElementById('bs-drag-zone');
   if (window.innerWidth < 640) {
     bs.style.display = 'flex';
     snapBottomSheet(BS_PEEK);
   }
 
-  handle.addEventListener('touchstart', (e) => {
+  dragZone.addEventListener('touchstart', (e) => {
     bsDragging = true;
     bsDragStartY = e.touches[0].clientY;
     bsDragStartH = parseInt(bs.style.height) || BS_PEEK;
     bs.style.transition = 'none';
   }, { passive: true });
 
-  handle.addEventListener('touchmove', (e) => {
+  // touchmove and touchend on window so drag continues even if finger leaves the zone
+  window.addEventListener('touchmove', (e) => {
     if (!bsDragging) return;
     const dy = bsDragStartY - e.touches[0].clientY;
     const newH = Math.max(BS_PEEK, Math.min(window.innerHeight, bsDragStartH + dy));
@@ -2226,10 +2237,10 @@ function initBottomSheet() {
     updateZoomControlPosition(newH);
   }, { passive: true });
 
-  handle.addEventListener('touchend', () => {
+  window.addEventListener('touchend', () => {
     if (!bsDragging) return;
     bsDragging = false;
-    const curH = parseInt(document.getElementById('bottom-sheet').style.height) || BS_PEEK;
+    const curH = parseInt(bs.style.height) || BS_PEEK;
     const vh = window.innerHeight;
     const snapPoints = [BS_PEEK, vh * 0.42, vh];
     const closest = snapPoints.reduce((a, b) => Math.abs(b - curH) < Math.abs(a - curH) ? b : a);
@@ -2247,14 +2258,20 @@ function snapBottomSheet(h) {
 
 function updateZoomControlPosition(sheetHeight) {
   if (!isMobile) return;
-  const zoomEl = document.querySelector('.leaflet-bottom.leaflet-right');
-  if (!zoomEl) return;
   const full = window.innerHeight;
-  if (sheetHeight >= full - 2) {
-    zoomEl.style.display = 'none';
-  } else {
-    zoomEl.style.display = '';
-    zoomEl.style.bottom = (sheetHeight + 14) + 'px';
+  const hidden = sheetHeight >= full - 2;
+  const offset = sheetHeight + 14;
+
+  const zoomEl = document.querySelector('.leaflet-bottom.leaflet-right');
+  if (zoomEl) {
+    zoomEl.style.display = hidden ? 'none' : '';
+    if (!hidden) zoomEl.style.bottom = offset + 'px';
+  }
+
+  const fabGroup = document.getElementById('map-fab-group');
+  if (fabGroup) {
+    fabGroup.style.display = hidden ? 'none' : '';
+    if (!hidden) fabGroup.style.bottom = offset + 'px';
   }
 }
 
