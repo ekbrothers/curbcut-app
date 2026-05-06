@@ -251,7 +251,7 @@ input, textarea, select { font-family: inherit; }
 #map {
   position: absolute;
   inset: 0;
-  bottom: 88px; /* always sits above the tab bar */
+  bottom: 104px; /* always sits above the tab bar */
 }
 
 @media (min-width: 640px) {
@@ -308,7 +308,7 @@ body.high-contrast .leaflet-tile-pane { filter: none !important; }
 #map-fab-group {
   position: absolute;
   right: 14px;
-  bottom: 140px; /* peek (88) + 14px gap + 38px extra lift */
+  bottom: 156px; /* peek (104) + 14px gap + 38px extra lift */
   z-index: 500;
   display: flex;
   flex-direction: column;
@@ -874,7 +874,7 @@ body.place-mode .pin-head {
   overflow: hidden;
   touch-action: none;
   transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-  height: 88px;
+  height: 104px;
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
@@ -909,26 +909,26 @@ body.place-mode .pin-head {
 }
 .bs-tab {
   flex: 1;
-  padding: 10px 4px 14px;
+  padding: 14px 4px 16px;
   text-align: center;
   font-weight: 600;
   color: var(--text3);
   border-bottom: 3px solid transparent;
   transition: color 0.15s, border-color 0.15s;
-  min-height: 68px;
+  min-height: 84px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 .bs-tab.active {
   color: var(--blue);
   border-bottom-color: var(--blue);
 }
-.bs-tab-icon { font-size: 20px; }
-.bs-tab-icon svg { width: 20px; height: 20px; }
-.bs-tab-label { font-size: 12px; font-weight: 600; }
+.bs-tab-icon { font-size: 26px; }
+.bs-tab-icon svg { width: 26px; height: 26px; }
+.bs-tab-label { font-size: 13px; font-weight: 600; }
 
 #bs-content { flex: 1; overflow: hidden; position: relative; min-height: 0; }
 .bs-panel { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; display: none; }
@@ -1820,7 +1820,7 @@ body.place-mode .pin-head {
       </svg>
     </div>
     <h2>Curb Cut — ADA Survey Tool</h2>
-    <p style="margin-bottom:12px">Curb cuts — the small ramps where sidewalks meet streets — are legally required under the Americans with Disabilities Act. When they're missing, broken, or too steep, people who use wheelchairs, walkers, or strollers can be completely blocked from moving through their own neighborhood.</p>
+    <p style="margin-bottom:12px">Curb cuts — the small ramps where sidewalks meet streets — are legally required under the Americans with Disabilities Act. When they're missing, broken, or too steep, people with mobility needs can be completely blocked from moving through their own neighborhood.</p>
     <p>This tool helps you <strong>map problem locations</strong>, document them with photos, and <strong>generate a formal complaint letter</strong> addressed to your local public works department — so your findings can actually drive change.</p>
     <div style="height:1px;background:var(--border);margin:20px 0"></div>
     <button id="onboard-welcome-start" onclick="showWelcomeScreen2()">
@@ -1977,7 +1977,7 @@ const strings = {
     alert_not_found: 'Location not found.',
     // Onboarding welcome screen 1
     ob_title: 'Curb Cut — ADA Survey Tool',
-    ob_p1: 'Curb cuts — the small ramps where sidewalks meet streets — are legally required under the Americans with Disabilities Act. When they\'re missing, broken, or too steep, people who use wheelchairs, walkers, or strollers can be completely blocked from moving through their own neighborhood.',
+    ob_p1: 'Curb cuts — the small ramps where sidewalks meet streets — are legally required under the Americans with Disabilities Act. When they\'re missing, broken, or too steep, people with mobility needs can be completely blocked from moving through their own neighborhood.',
     ob_p2_pre: 'This tool helps you ',
     ob_p2_strong1: 'map problem locations',
     ob_p2_mid: ', document them with photos, and ',
@@ -2025,7 +2025,7 @@ const strings = {
     pdf_dear_dept: 'Dear {dept} Officials,',
     pdf_p1: 'As someone with accessibility needs, I depend on safe, compliant pedestrian infrastructure to move through my community independently. The Americans with Disabilities Act of 1990 provides important protections in this regard — particularly Title II, which affirms that state and local governments must ensure their programs, services, and public rights-of-way are accessible to people with disabilities. It is from that personal experience, and with the hope of a more inclusive {city}, that I write to bring several locations to your attention.',
     pdf_p2: 'As part of a careful accessibility survey I conducted in {scope}, I identified {count} location{s} where curb cuts are either absent, severely deteriorated, or do not meet current accessibility standards — including the 2010 ADA Standards for Accessible Design (Section 406) and the Public Rights-of-Way Accessibility Guidelines (PROWAG).',
-    pdf_p3: 'Missing or inadequate curb cuts create very real daily barriers for people who use wheelchairs, scooters, walkers, and other mobility aids, as well as for parents with strollers and individuals with visual impairments who rely on detectable warning surfaces. For many of us, these gaps in infrastructure mean having to travel significantly out of the way, enter traffic, or simply forgo trips that others take for granted.',
+    pdf_p3: 'Missing or inadequate curb cuts create very real daily barriers for people with mobility needs. For many of us, these gaps in infrastructure mean having to travel significantly out of the way, enter traffic, or simply forgo trips that others take for granted.',
     pdf_p4: 'I respectfully ask that {dept} review the attached survey documentation, which includes GPS-verified locations, photographs, and descriptions of each site. I hope your department will consider establishing a remediation timeline and prioritizing these locations for curb cut installation or repair in the next available capital improvement cycle.',
     pdf_p5: 'Thank you sincerely for your time and attention to this matter. I would welcome the opportunity to meet with department representatives to walk the survey area together and discuss these findings further. Please do not hesitate to contact me — I am happy to help in any way I can.',
     pdf_closing: 'Respectfully submitted,',
@@ -2183,7 +2183,7 @@ const strings = {
     pdf_dear_dept: 'Estimados funcionarios de {dept}:',
     pdf_p1: 'Como persona con necesidades de accesibilidad, dependo de una infraestructura peatonal segura y conforme para moverme de manera independiente por mi comunidad. La Ley de Estadounidenses con Discapacidades de 1990 ofrece protecciones importantes al respecto — en particular el Título II, que establece que los gobiernos estatales y locales deben garantizar que sus programas, servicios y vías públicas sean accesibles para las personas con discapacidades. Es desde esa experiencia personal, y con la esperanza de una {city} más inclusiva, que escribo para llamar su atención sobre varias ubicaciones.',
     pdf_p2: 'Como parte de una cuidadosa inspección de accesibilidad que realicé en {scope}, identifiqué {count} ubicación{s} donde las rampas de acera están ausentes, gravemente deterioradas o no cumplen con los estándares de accesibilidad vigentes — incluidos los Estándares de Diseño Accesible ADA 2010 (Sección 406) y las Directrices de Accesibilidad para Derechos de Vía Públicos (PROWAG).',
-    pdf_p3: 'Las rampas de acera inadecuadas o inexistentes crean barreras diarias muy reales para las personas que utilizan sillas de ruedas, scooters, andadores y otros dispositivos de movilidad, así como para padres con carriolas y personas con discapacidades visuales que dependen de superficies de advertencia detectables. Para muchos de nosotros, estas deficiencias en la infraestructura implican tener que desviarse considerablemente, circular por la calzada o simplemente renunciar a desplazamientos que otros dan por sentados.',
+    pdf_p3: 'Las rampas de acera inadecuadas o inexistentes crean barreras diarias muy reales para las personas con necesidades de movilidad. Para muchos de nosotros, estas deficiencias en la infraestructura implican tener que desviarse considerablemente, circular por la calzada o simplemente renunciar a desplazamientos que otros dan por sentados.',
     pdf_p4: 'Solicito respetuosamente que {dept} revise la documentación de inspección adjunta, que incluye ubicaciones verificadas por GPS, fotografías y descripciones de cada sitio. Espero que su departamento considere establecer un calendario de reparaciones y priorice estas ubicaciones para la instalación o reparación de rampas en el próximo ciclo de mejoras de capital disponible.',
     pdf_p5: 'Le agradezco sinceramente su tiempo y atención a este asunto. Estaría encantado/a de reunirme con representantes del departamento para recorrer el área inspeccionada juntos y analizar estos hallazgos con más detalle. No dude en ponerse en contacto conmigo — con gusto colaboraré en todo lo que pueda.',
     pdf_closing: 'Atentamente,',
@@ -2344,7 +2344,7 @@ let gpsHullPolygon = null;
 let lastGpsPos = null;
 
 // Bottom sheet
-const BS_PEEK = 88; // handle (20px) + tab bar (68px) — always visible
+const BS_PEEK = 104; // handle (20px) + tab bar (84px) — always visible
 let bsCurrentSnap = BS_PEEK;
 let bsDragStartY = 0;
 let bsDragStartH = 0;
