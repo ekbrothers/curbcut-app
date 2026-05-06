@@ -725,6 +725,12 @@ textarea.field-input { resize: vertical; min-height: 72px; line-height: 1.5; }
 }
 .pdf-btn:hover { background: var(--navy2); }
 .pdf-btn:active { transform: scale(0.98); }
+.pdf-btn:disabled {
+  background: var(--surf3);
+  color: var(--text3);
+  cursor: not-allowed;
+  transform: none;
+}
 
 /* Empty state */
 .empty-state {
@@ -1675,6 +1681,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMap();
   initBottomSheet();
   restoreSession();
+  renderMarkerLists();
 });
 
 window.addEventListener('resize', () => {
@@ -1928,6 +1935,8 @@ function renderMarkerLists() {
   const badge = document.getElementById('sb-loc-count');
   if (markers.length > 0) { badge.textContent = markers.length; badge.style.display = ''; }
   else { badge.style.display = 'none'; }
+  // Enable/disable PDF buttons
+  document.querySelectorAll('.pdf-btn').forEach(btn => { btn.disabled = markers.length === 0; });
 }
 
 function markerCardHTML(m, i) {
