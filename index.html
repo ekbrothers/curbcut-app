@@ -305,7 +305,7 @@ body.high-contrast .leaflet-tile-pane { filter: none !important; }
 #map-fab-group {
   position: absolute;
   right: 14px;
-  bottom: 78px; /* fallback: peek (64) + 14px gap; overridden by JS on mobile */
+  bottom: 90px; /* fallback: peek (76) + 14px gap; overridden by JS on mobile */
   z-index: 500;
   display: flex;
   flex-direction: column;
@@ -857,7 +857,7 @@ body.place-mode .pin-head {
 #bottom-sheet {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  z-index: 510;
+  z-index: 800;
   background: var(--surface);
   border-radius: 20px 20px 0 0;
   box-shadow: 0 -8px 32px rgba(15,31,61,0.18);
@@ -866,7 +866,7 @@ body.place-mode .pin-head {
   overflow: hidden;
   touch-action: none;
   transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-  height: 64px;
+  height: 76px;
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
@@ -901,26 +901,26 @@ body.place-mode .pin-head {
 }
 .bs-tab {
   flex: 1;
-  padding: 8px 4px 10px;
+  padding: 10px 4px 12px;
   text-align: center;
-  font-size: 11.5px;
   font-weight: 600;
   color: var(--text3);
-  border-bottom: 2.5px solid transparent;
+  border-bottom: 3px solid transparent;
   transition: color 0.15s, border-color 0.15s;
-  min-height: 44px;
+  min-height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 .bs-tab.active {
   color: var(--blue);
   border-bottom-color: var(--blue);
 }
-.bs-tab-icon { font-size: 16px; }
-.bs-tab-label { font-size: 10px; font-weight: 600; }
+.bs-tab-icon { font-size: 20px; }
+.bs-tab-icon svg { width: 20px; height: 20px; }
+.bs-tab-label { font-size: 12px; font-weight: 600; }
 
 #bs-content { flex: 1; overflow: hidden; position: relative; min-height: 0; }
 .bs-panel { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; display: none; }
@@ -2285,7 +2285,7 @@ let gpsHullPolygon = null;
 let lastGpsPos = null;
 
 // Bottom sheet
-const BS_PEEK = 64; // handle (20px) + tab bar (44px) — always visible
+const BS_PEEK = 76; // handle (20px) + tab bar (56px) — always visible
 let bsCurrentSnap = BS_PEEK;
 let bsDragStartY = 0;
 let bsDragStartH = 0;
