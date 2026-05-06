@@ -224,6 +224,14 @@ input, textarea, select { font-family: inherit; }
   border-bottom: 1px solid var(--border) !important;
 }
 
+/* Move zoom control to bottom-right on mobile */
+@media (max-width: 639px) {
+  .leaflet-top.leaflet-right {
+    top: auto !important;
+    bottom: 14px !important;
+  }
+}
+
 /* Attribution */
 .leaflet-control-attribution {
   background: rgba(255,255,255,0.75) !important;
