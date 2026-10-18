@@ -8,9 +8,9 @@
 <meta name="apple-mobile-web-app-title" content="Curb Cut">
 <title>Curb Cut</title>
 
-<!-- MapLibre GL (tiles from OpenFreeMap, no API key) -->
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"/>
-<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <!-- html2canvas -->
@@ -258,45 +258,47 @@ input, textarea, select { font-family: inherit; }
   #map { bottom: 0; }
 }
 
-/* Override MapLibre zoom control */
-.maplibregl-ctrl-top-right .maplibregl-ctrl-group {
+/* Override leaflet zoom control */
+.leaflet-control-zoom {
   border: none !important;
   border-radius: var(--radius) !important;
   overflow: hidden;
   box-shadow: var(--shadow) !important;
-  background: var(--surface) !important;
 }
-.maplibregl-ctrl-group button.maplibregl-ctrl-zoom-in,
-.maplibregl-ctrl-group button.maplibregl-ctrl-zoom-out {
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
   background: var(--surface) !important;
+  color: var(--text1) !important;
   border: none !important;
+  font-size: 18px !important;
   width: 44px !important;
   height: 44px !important;
+  line-height: 44px !important;
+  font-family: var(--font) !important;
   transition: background 0.15s !important;
 }
-.maplibregl-ctrl-group button.maplibregl-ctrl-zoom-in:hover,
-.maplibregl-ctrl-group button.maplibregl-ctrl-zoom-out:hover {
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
   background: var(--surf2) !important;
 }
-.maplibregl-ctrl-group button.maplibregl-ctrl-zoom-in {
+.leaflet-control-zoom-in {
   border-bottom: 1px solid var(--border) !important;
 }
-body.dark .maplibregl-ctrl-group .maplibregl-ctrl-icon { filter: invert(1); }
 
 /* Zoom control sits top-right on mobile, just below the header */
 @media (max-width: 639px) {
-  .maplibregl-ctrl-top-right {
-    top: 4px !important;
-    right: 4px !important;
+  .leaflet-top.leaflet-right {
+    top: 14px !important;
+    right: 14px !important;
   }
 }
 
 /* Dark mode map: invert + hue-rotate gives a dark cartographic look */
-body.dark .maplibregl-canvas {
+body.dark .leaflet-tile-pane {
   filter: invert(1) hue-rotate(180deg) brightness(0.85) saturate(0.9) !important;
 }
 /* High contrast keeps tiles full-colour for readability */
-body.high-contrast .maplibregl-canvas { filter: none !important; }
+body.high-contrast .leaflet-tile-pane { filter: none !important; }
 
 
 
@@ -421,8 +423,7 @@ body.high-contrast .maplibregl-canvas { filter: none !important; }
   50% { opacity: 0.5; transform: scale(0.6); }
 }
 body.place-mode #place-mode-banner { display: flex; }
-body.place-mode #map,
-body.place-mode #map .maplibregl-canvas-container.maplibregl-interactive { cursor: crosshair; }
+body.place-mode #map { cursor: crosshair; }
 
 /* ============================================================
    SIDEBAR (desktop)
@@ -2414,56 +2415,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.addEventListener('resize', () => {
   isMobile = window.innerWidth < 640;
-  map && map.resize();
+  map && map.invalidateSize();
 });
 
 // ============================================================
 // MAP
 // ============================================================
-const EMPTY_GEOJSON = { type: 'FeatureCollection', features: [] };
-
 function initMap() {
-  map = new maplibregl.Map({
-    container: 'map',
-    style: 'https://tiles.openfreemap.org/styles/liberty',
-    center: [-98.35, 39.5],
-    zoom: 3,
+  map = L.map('map', {
+    zoomControl: false,
+    center: [39.5, -98.35],
+    zoom: 4,
+    attributionControl: false
+  });
+
+  // Plain OpenStreetMap raster tiles: no API key, and Leaflet draws them without WebGL
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 19,
-    attributionControl: false,
-    dragRotate: false,
-    pitchWithRotate: false,
-    // Keeps the WebGL canvas readable so html2canvas can capture it for the PDF
-    preserveDrawingBuffer: true
-  });
-  map.touchZoomRotate.disableRotation();
+    crossOrigin: true
+  }).addTo(map);
+  L.control.attribution({ prefix: false, position: 'bottomleft' }).addTo(map);
 
-  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
-  map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
-
-  // The Liberty style references a few POI icons missing from its sprite; fill them with a blank pixel
-  map.on('styleimagemissing', (e) => {
-    if (!map.hasImage(e.id)) map.addImage(e.id, { width: 1, height: 1, data: new Uint8Array(4) });
-  });
-
-  map.on('load', () => {
-    // Flat buildings read better on a top-down survey map than 3D extrusions
-    if (map.getLayer('building-3d')) map.setLayoutProperty('building-3d', 'visibility', 'none');
-    // Start the OSM attribution collapsed to its (i) button
-    const attrib = document.querySelector('#map .maplibregl-ctrl-attrib');
-    if (attrib) attrib.classList.remove('maplibregl-compact-show');
-    map.addSource('gps-acc', { type: 'geojson', data: EMPTY_GEOJSON });
-    map.addSource('gps-hull', { type: 'geojson', data: EMPTY_GEOJSON });
-    map.addSource('gps-path', { type: 'geojson', data: EMPTY_GEOJSON });
-    map.addLayer({ id: 'gps-acc-fill', type: 'fill', source: 'gps-acc', paint: { 'fill-color': '#2451b7', 'fill-opacity': 0.07 } });
-    map.addLayer({ id: 'gps-acc-line', type: 'line', source: 'gps-acc', paint: { 'line-color': '#2451b7', 'line-width': 1 } });
-    map.addLayer({ id: 'gps-hull-fill', type: 'fill', source: 'gps-hull', paint: { 'fill-color': '#2451b7', 'fill-opacity': 0.1 } });
-    map.addLayer({ id: 'gps-hull-line', type: 'line', source: 'gps-hull', paint: { 'line-color': '#1a3260', 'line-width': 1.5 } });
-    map.addLayer({ id: 'gps-path-line', type: 'line', source: 'gps-path',
-      layout: { 'line-join': 'round', 'line-cap': 'round' },
-      paint: { 'line-color': '#2451b7', 'line-width': 3, 'line-opacity': 0.65 } });
-    // GPS data may have been restored before the style finished loading
-    updateGpsPolyline(); updateGpsHull(); updateGpsAccuracy();
-  });
+  L.control.zoom({ position: 'topright' }).addTo(map);
 
   map.on('click', (e) => {
     closeMobSearch();
@@ -2472,7 +2446,7 @@ function initMap() {
       const now = Date.now();
       if (now - lastPlacedTime < 600) return;
       lastPlacedTime = now;
-      dropPin(e.lngLat.lat, e.lngLat.lng);
+      dropPin(e.latlng.lat, e.latlng.lng);
     }
   });
 
@@ -2500,14 +2474,13 @@ function initMap() {
     }
 
     if (mode !== 'place') return;
-    if (e.target.closest && e.target.closest('.maplibregl-marker, .maplibregl-ctrl')) return;
     if (Math.abs(dx) > 10 || Math.abs(dy) > 10) return;
     const now = Date.now();
     if (now - lastPlacedTime < 600) return;
     lastPlacedTime = now;
     const rect = mapEl.getBoundingClientRect();
-    const lngLat = map.unproject([t.clientX - rect.left, t.clientY - rect.top]);
-    dropPin(lngLat.lat, lngLat.lng);
+    const latlng = map.containerPointToLatLng(L.point(t.clientX - rect.left, t.clientY - rect.top));
+    dropPin(latlng.lat, latlng.lng);
     if (isMobile) snapBottomSheet(BS_PEEK);
   }, { passive: true });
 }
@@ -2545,7 +2518,7 @@ function toggleMobPlace() {
 function dropPin(lat, lng) {
   const id = nextId++;
   const marker = { id, lat, lng, desc: t('geocode_looking'), autoDesc: true, photo: null, geocoding: true };
-  marker.mapMarker = createMapMarker(id, lat, lng);
+  marker.leafletMarker = createLeafletMarker(id, lat, lng);
   markers.push(marker);
   refreshMarkerIcons();
   renderMarkerLists();
@@ -2560,20 +2533,29 @@ function dropPin(lat, lng) {
   });
 }
 
-function createMapMarker(id, lat, lng) {
-  const el = document.createElement('div');
-  el.innerHTML = `<div class="pin-wrap"><div class="pin-head"><span class="pin-num">?</span></div></div>`;
-  el.addEventListener('click', (e) => {
-    e.stopPropagation();
+function createLeafletMarker(id, lat, lng) {
+  const icon = L.divIcon({
+    className: '',
+    html: `<div class="pin-wrap"><div class="pin-head"><span class="pin-num">?</span></div></div>`,
+    iconSize: [32, 40], iconAnchor: [16, 40], popupAnchor: [0, -40]
+  });
+  const lm = L.marker([lat, lng], { icon }).addTo(map);
+  lm.on('click', (e) => {
+    L.DomEvent.stopPropagation(e);
     if (mode === 'place') deleteMarker(id);
     else openModal(id);
   });
-  return new maplibregl.Marker({ element: el, anchor: 'bottom' }).setLngLat([lng, lat]).addTo(map);
+  return lm;
 }
 
 function refreshMarkerIcons() {
   markers.forEach((m, i) => {
-    m.mapMarker.getElement().querySelector('.pin-num').textContent = i + 1;
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="pin-wrap"><div class="pin-head"><span class="pin-num">${i + 1}</span></div></div>`,
+      iconSize: [32, 40], iconAnchor: [16, 40], popupAnchor: [0, -40]
+    });
+    m.leafletMarker.setIcon(icon);
   });
 }
 
@@ -2690,7 +2672,7 @@ function resizeImage(dataUrl, maxSize, callback) {
 function deleteMarker(id) {
   const idx = markers.findIndex(x => x.id === id);
   if (idx === -1) return;
-  markers[idx].mapMarker.remove();
+  map.removeLayer(markers[idx].leafletMarker);
   markers.splice(idx, 1);
   refreshMarkerIcons(); renderMarkerLists(); autoSave();
 }
@@ -2768,7 +2750,7 @@ function esc(s) {
 }
 
 function flyTo(lat, lng) {
-  map.flyTo({ center: [lng, lat], zoom: Math.max(map.getZoom(), 16) });
+  map.flyTo([lat, lng], Math.max(map.getZoom(), 17));
   if (isMobile) snapBottomSheet(BS_PEEK);
 }
 
@@ -2814,7 +2796,7 @@ async function geocodeSearch(query) {
   const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
   const resp = await fetch(url, { headers: { 'Accept-Language': 'en' } });
   const data = await resp.json();
-  if (data && data[0]) { map.flyTo({ center: [parseFloat(data[0].lon), parseFloat(data[0].lat)], zoom: 15 }); }
+  if (data && data[0]) { map.flyTo([parseFloat(data[0].lat), parseFloat(data[0].lon)], 16); }
   else { alert(t('alert_not_found')); }
 }
 
@@ -2858,23 +2840,24 @@ function startGps() {
 function stopGps() {
   if (gpsWatchId !== null) navigator.geolocation.clearWatch(gpsWatchId);
   gpsWatchId = null; gpsTracking = false;
-  if (gpsDot) { gpsDot.remove(); gpsDot = null; }
-  gpsAccCircle = null; updateGpsAccuracy();
+  if (gpsDot) { map.removeLayer(gpsDot); gpsDot = null; }
+  if (gpsAccCircle) { map.removeLayer(gpsAccCircle); gpsAccCircle = null; }
   updateGpsUI();
 }
 
 function onGpsPos(pos) {
   lastGpsPos = pos;
   const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+  const latlng = L.latLng(lat, lng);
   if (!gpsDot) {
-    const el = document.createElement('div');
-    el.className = 'gps-dot-marker';
-    el.style.zIndex = 1000;
-    gpsDot = new maplibregl.Marker({ element: el }).setLngLat([lng, lat]).addTo(map);
-    map.flyTo({ center: [lng, lat], zoom: Math.max(map.getZoom(), 15) });
-  } else { gpsDot.setLngLat([lng, lat]); }
-  gpsAccCircle = { lat, lng, radius: accuracy };
-  updateGpsAccuracy();
+    gpsDot = L.marker(latlng, {
+      icon: L.divIcon({ className: '', html: '<div class="gps-dot-marker"></div>', iconSize: [16,16], iconAnchor: [8,8] }),
+      zIndexOffset: 1000
+    }).addTo(map);
+    map.flyTo(latlng, Math.max(map.getZoom(), 16));
+  } else { gpsDot.setLatLng(latlng); }
+  if (gpsAccCircle) map.removeLayer(gpsAccCircle);
+  gpsAccCircle = L.circle(latlng, { radius: accuracy, color: '#2451b7', fillColor: '#2451b7', fillOpacity: 0.07, weight: 1 }).addTo(map);
   const last = gpsPoints[gpsPoints.length - 1];
   if (!last || haversine(last.lat, last.lng, lat, lng) > 3) {
     gpsPoints.push({ lat, lng }); updateGpsPolyline(); updateGpsHull();
@@ -2891,7 +2874,7 @@ function dropPinAtGps() {
     (pos) => {
       lastGpsPos = pos;
       dropPin(pos.coords.latitude, pos.coords.longitude);
-      map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: Math.max(map.getZoom(), 17) });
+      map.flyTo([pos.coords.latitude, pos.coords.longitude], Math.max(map.getZoom(), 18));
       showToast(t('toast_pin_dropped'));
     },
     (err) => { showToast(t('toast_location_error')); },
@@ -2899,42 +2882,20 @@ function dropPinAtGps() {
   );
 }
 
-// Sources only exist once the style has loaded; the load handler re-runs these
-function setMapData(sourceId, data) {
-  const src = map && map.getSource(sourceId);
-  if (src) src.setData(data);
-}
-
 function updateGpsPolyline() {
-  gpsPolyline = gpsPoints.length >= 2 ? gpsPoints.map(p => [p.lng, p.lat]) : null;
-  setMapData('gps-path', gpsPolyline
-    ? { type: 'Feature', geometry: { type: 'LineString', coordinates: gpsPolyline } }
-    : EMPTY_GEOJSON);
+  if (gpsPolyline) map.removeLayer(gpsPolyline);
+  if (gpsPoints.length < 2) return;
+  gpsPolyline = L.polyline(gpsPoints.map(p => [p.lat, p.lng]), { color: '#2451b7', weight: 3, opacity: 0.65 }).addTo(map);
 }
 
 function updateGpsHull() {
-  gpsHullPolygon = null;
-  if (gpsPoints.length >= 3) {
-    const hull = convexHull(gpsPoints);
-    if (hull.length >= 3) gpsHullPolygon = hull.map(p => [p.lng, p.lat]);
-  }
-  setMapData('gps-hull', gpsHullPolygon
-    ? { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[...gpsHullPolygon, gpsHullPolygon[0]]] } }
-    : EMPTY_GEOJSON);
-}
-
-// Accuracy circle approximated as a 64-sided polygon around the GPS fix
-function updateGpsAccuracy() {
-  if (!gpsAccCircle) { setMapData('gps-acc', EMPTY_GEOJSON); return; }
-  const { lat, lng, radius } = gpsAccCircle;
-  const dLat = radius / 111320;
-  const dLng = radius / (111320 * Math.cos(lat * Math.PI / 180));
-  const ring = [];
-  for (let i = 0; i <= 64; i++) {
-    const a = (i / 64) * 2 * Math.PI;
-    ring.push([lng + dLng * Math.cos(a), lat + dLat * Math.sin(a)]);
-  }
-  setMapData('gps-acc', { type: 'Feature', geometry: { type: 'Polygon', coordinates: [ring] } });
+  if (gpsHullPolygon) { map.removeLayer(gpsHullPolygon); gpsHullPolygon = null; }
+  if (gpsPoints.length < 3) return;
+  const hull = convexHull(gpsPoints);
+  if (hull.length < 3) return;
+  gpsHullPolygon = L.polygon(hull.map(p => [p.lat, p.lng]), {
+    color: '#1a3260', fillColor: '#2451b7', fillOpacity: 0.1, weight: 1.5
+  }).addTo(map);
 }
 
 function updateGpsUI() {
@@ -3053,7 +3014,7 @@ function updateZoomControlPosition(sheetHeight) {
   const offset = sheetHeight + 14;
 
   // Zoom stays top-right fixed — only hide it when sheet is full-screen
-  const zoomEl = document.querySelector('.maplibregl-ctrl-top-right');
+  const zoomEl = document.querySelector('.leaflet-top.leaflet-right');
   if (zoomEl) zoomEl.style.display = hidden ? 'none' : '';
 
   // FABs track above the sheet bottom
@@ -3113,12 +3074,12 @@ function restoreSession() {
     if (!raw) return;
     const data = JSON.parse(raw);
     if (data.fields) Object.keys(data.fields).forEach(k => syncFields(k, data.fields[k] || ''));
-    if (data.mapView) map.jumpTo({ center: [data.mapView.lng, data.mapView.lat], zoom: data.mapView.zoom });
+    if (data.mapView) map.setView([data.mapView.lat, data.mapView.lng], data.mapView.zoom);
     if (data.nextId) nextId = data.nextId;
     if (data.markers) {
       data.markers.forEach(md => {
         const m = { ...md, geocoding: false, autoDesc: md.autoDesc || false };
-        m.mapMarker = createMapMarker(m.id, m.lat, m.lng);
+        m.leafletMarker = createLeafletMarker(m.id, m.lat, m.lng);
         markers.push(m);
       });
       refreshMarkerIcons(); renderMarkerLists();
@@ -3131,7 +3092,7 @@ function restoreSession() {
 
 function clearAll() {
   if (!confirm(t('confirm_clear'))) return;
-  markers.forEach(m => m.mapMarker.remove());
+  markers.forEach(m => map.removeLayer(m.leafletMarker));
   markers = []; nextId = 1;
   renderMarkerLists();
   autoSave();
@@ -3239,12 +3200,9 @@ async function generatePDF() {
   }
 
   async function flyToBoundsAndWait(latLngs) {
-    const bounds = new maplibregl.LngLatBounds();
-    latLngs.forEach(([lat, lng]) => bounds.extend([lng, lat]));
-    map.fitBounds(bounds, { padding: 48, maxZoom: 17, animate: false });
-    map.triggerRepaint();
-    // 'idle' fires once the new view's tiles have finished rendering
-    await new Promise(resolve => { let settled = false; const done = () => { if (!settled) { settled = true; setTimeout(resolve, 200); } }; map.once('idle', done); setTimeout(done, 4000); });
+    const bounds = L.latLngBounds(latLngs);
+    map.fitBounds(bounds, { padding: [48,48], maxZoom: 18 });
+    await new Promise(resolve => { const done = () => setTimeout(resolve, 700); map.once('moveend', done); setTimeout(done, 2000); });
   }
 
   const savedCenter = map.getCenter(); const savedZoom = map.getZoom();
@@ -3267,7 +3225,7 @@ async function generatePDF() {
       }
     }
   }
-  map.jumpTo({ center: savedCenter, zoom: savedZoom });
+  map.setView(savedCenter, savedZoom);
 
   // Location detail pages — bilingual labels (EN / ES)
   const colors = ['#2451b7','#1db87e','#f59e0b','#e84040','#8b5cf6','#06b6d4','#ec4899'];
