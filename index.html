@@ -3109,7 +3109,6 @@ async function generatePDF() {
   const H = doc.internal.pageSize.getHeight();
   const margin = 60;
   const contentW = W - margin * 2;
-  let pageNum = 1;
 
   const city = getField('city') || 'Your City';
   const surveyor = getField('surveyor') || 'Concerned Resident';
@@ -3117,14 +3116,6 @@ async function generatePDF() {
   const dept = getField('dept') || 'Department of Public Works';
   const deptaddr = getField('deptaddr') || '';
   const scope = getField('scope') || 'the surveyed area';
-
-  function addFooter(lc) {
-    const foot = strings[lc].pdf_footer;
-    doc.setFontSize(9); doc.setTextColor(150,150,150);
-    doc.text(`Page ${pageNum}`, W/2, H-24, { align:'center' });
-    doc.text(foot, margin, H-24);
-    pageNum++;
-  }
 
   // Write one full cover letter in the given language
   function writeCoverLetter(lc) {
@@ -3166,12 +3157,11 @@ async function generatePDF() {
     for (const para of paras) {
       const lines = doc.splitTextToSize(para, contentW);
       doc.text(lines, margin, y); y += lines.length * 15 + 12;
-      if (y > H - 100) { addFooter(lc); doc.addPage(); y = margin; }
+      if (y > H - 100) { doc.addPage(); y = margin; }
     }
     y += 10;
     doc.text(tl('pdf_closing'), margin, y); y += 28;
     doc.setFont('helvetica','bold'); doc.text(surveyor, margin, y); doc.setFont('helvetica','normal');
-    addFooter(lc);
   }
 
   // English cover letter
@@ -3181,22 +3171,70 @@ async function generatePDF() {
   doc.addPage();
   writeCoverLetter('es');
 
-  // Map pages (language-neutral, use current UI lang for labels)
-  async function addMapPage(label) {
+  // Body: maps and location cards flow together instead of one item per page
+  const colors = ['#2451b7','#1db87e','#f59e0b','#e84040','#8b5cf6','#06b6d4','#ec4899'];
+  const bottomLimit = H - 50;
+  let y = 0;
+
+  function newBodyPage(label) {
     doc.addPage();
-    doc.setFillColor(15,31,61); doc.rect(0,0,W,40,'F');
-    doc.setFillColor(29,184,126); doc.rect(0,40,W,3,'F');
-    doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text(label, margin, 26);
+    doc.setFillColor(15,31,61); doc.rect(0,0,W,32,'F');
+    doc.setFillColor(29,184,126); doc.rect(0,32,W,3,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(13); doc.setFont('helvetica','bold');
+    doc.text(label, margin, 21);
     doc.setTextColor(30,41,59); doc.setFont('helvetica','normal');
+    y = 50;
+  }
+
+  async function addMap(maxH) {
     try {
-      const mapEl = document.getElementById('map');
-      const canvas = await html2canvas(mapEl, { useCORS: true, allowTaint: true, scale: 1.5 });
-      const imgData = canvas.toDataURL('image/jpeg', 0.85);
-      const mapY = 55; const mapH = H - mapY - 60;
-      doc.addImage(imgData, 'JPEG', margin, mapY, contentW, mapH);
-    } catch(e) { doc.setFontSize(11); doc.text(t('pdf_map_unavailable'), margin, 80); }
-    addFooter(lang);
+      const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, allowTaint: true, scale: 1.5 });
+      const ratio = canvas.height / canvas.width;
+      let w = contentW, h = w * ratio;
+      if (h > maxH) { h = maxH; w = h / ratio; }
+      doc.addImage(canvas.toDataURL('image/jpeg', 0.85), 'JPEG', margin + (contentW - w) / 2, y, w, h);
+      y += h + 12;
+    } catch(e) {
+      doc.setFontSize(11); doc.text(t('pdf_map_unavailable'), margin, y + 14); y += 28;
+    }
+  }
+
+  function addCard(i) {
+    const m = markers[i];
+    const thumbMax = 120;
+    let tw = 0, th = 0;
+    if (m.photo) {
+      try {
+        const p = doc.getImageProperties(m.photo);
+        const sc = Math.min(thumbMax / p.width, thumbMax / p.height);
+        tw = p.width * sc; th = p.height * sc;
+      } catch(e) {}
+    }
+    const textW = contentW - 30 - (tw ? tw + 12 : 0);
+    doc.setFontSize(10);
+    const dlines = doc.splitTextToSize(m.desc || t('pdf_no_desc'), textW);
+    const textH = dlines.length * 12 + 30;
+    const cardH = Math.max(textH, th) + 12;
+    if (y + cardH > bottomLimit) { doc.addPage(); y = margin; }
+
+    const [r,g,b] = hexToRgb(colors[i % colors.length]);
+    doc.setFillColor(r,g,b); doc.circle(margin + 10, y + 10, 10, 'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text(String(i+1), margin + 10, y + 13, { align:'center' });
+
+    doc.setTextColor(30,41,59); doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    doc.text(dlines, margin + 30, y + 12);
+    const ly = y + 12 + dlines.length * 12 + 2;
+    doc.setFontSize(9); doc.setTextColor(100,116,139);
+    const coords = `${m.lat.toFixed(6)}, ${m.lng.toFixed(6)}   `;
+    doc.text(coords, margin + 30, ly);
+    doc.setTextColor(36,81,183);
+    doc.textWithLink(`${strings.en.pdf_gmaps} / ${strings.es.pdf_gmaps}`, margin + 30 + doc.getTextWidth(coords), ly, { url: `https://maps.google.com/?q=${m.lat},${m.lng}` });
+    doc.setTextColor(30,41,59);
+
+    if (tw) { try { doc.addImage(m.photo, 'JPEG', margin + contentW - tw, y, tw, th); } catch(e) {} }
+    y += cardH;
+    doc.setDrawColor(226,232,240); doc.line(margin, y - 5, margin + contentW, y - 5);
   }
 
   async function flyToBoundsAndWait(latLngs) {
@@ -3209,69 +3247,37 @@ async function generatePDF() {
   const pluralSCurrent = lang === 'es' ? (markers.length !== 1 ? 'es' : '') : (markers.length !== 1 ? 's' : '');
 
   if (markers.length === 0) {
-    await addMapPage(t('pdf_map_overview'));
+    newBodyPage(t('pdf_map_overview'));
+    await addMap(420);
   } else {
-    const allLatLngs = markers.map(m => [m.lat, m.lng]);
-    await flyToBoundsAndWait(allLatLngs);
-    const overviewZoom = map.getZoom();
-    await addMapPage(t('pdf_map_all', {count: markers.length, s: pluralSCurrent}));
-    if (overviewZoom < 14 && markers.length > 1) {
+    await flyToBoundsAndWait(markers.map(m => [m.lat, m.lng]));
+    const chunked = map.getZoom() < 14 && markers.length > 1;
+    newBodyPage(t('pdf_map_all', {count: markers.length, s: pluralSCurrent}));
+    await addMap(chunked ? 300 : 320);
+    if (!chunked) {
+      markers.forEach((_, i) => addCard(i));
+    } else {
+      // Zoomed-out surveys: add a closer map per group of locations, each followed by its cards
       const CHUNK = 6;
       for (let i = 0; i < markers.length; i += CHUNK) {
-        const chunk = markers.slice(i, i + CHUNK);
-        const nums = chunk.map((m,j) => i+j+1);
-        await flyToBoundsAndWait(chunk.map(m => [m.lat, m.lng]));
-        await addMapPage(t('pdf_map_chunk', {a: nums[0], b: nums[nums.length-1]}));
+        const end = Math.min(i + CHUNK, markers.length);
+        await flyToBoundsAndWait(markers.slice(i, end).map(m => [m.lat, m.lng]));
+        if (y + 220 > bottomLimit) newBodyPage(t('pdf_map_chunk', {a: i+1, b: end}));
+        else { doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text(t('pdf_map_chunk', {a: i+1, b: end}), margin, y + 4); doc.setFont('helvetica','normal'); y += 12; }
+        await addMap(240);
+        for (let j = i; j < end; j++) addCard(j);
       }
     }
   }
   map.setView(savedCenter, savedZoom);
 
-  // Location detail pages — bilingual labels (EN / ES)
-  const colors = ['#2451b7','#1db87e','#f59e0b','#e84040','#8b5cf6','#06b6d4','#ec4899'];
-  for (let i = 0; i < markers.length; i++) {
-    const m = markers[i];
-    doc.addPage();
-    const color = colors[i % colors.length];
-    const [r,g,b] = hexToRgb(color);
-    doc.setFillColor(r,g,b); doc.rect(0,0,W,44,'F');
-    doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text(`${strings.en.pdf_loc_header.replace('{n}', i+1)}  /  ${strings.es.pdf_loc_header.replace('{n}', i+1)}`, margin, 28);
-    doc.setTextColor(30,41,59); doc.setFont('helvetica','normal');
-    let y = 64;
-    doc.setFontSize(11); doc.setFont('helvetica','bold');
-    doc.text(`${strings.en.pdf_desc_label}  /  ${strings.es.pdf_desc_label}`, margin, y); y += 16;
-    doc.setFont('helvetica','normal');
-    const dlines = doc.splitTextToSize(m.desc || t('pdf_no_desc'), contentW);
-    doc.text(dlines, margin, y); y += dlines.length * 14 + 12;
-    doc.setFont('helvetica','bold');
-    doc.text(`${strings.en.pdf_coords_label}  /  ${strings.es.pdf_coords_label}`, margin, y); y += 16;
-    doc.setFont('helvetica','normal'); doc.text(`${m.lat.toFixed(6)}, ${m.lng.toFixed(6)}`, margin, y); y += 16;
-    const gmapsUrl = `https://maps.google.com/?q=${m.lat},${m.lng}`;
-    doc.setTextColor(36,81,183); doc.textWithLink(`${strings.en.pdf_gmaps}  /  ${strings.es.pdf_gmaps}`, margin, y, { url: gmapsUrl });
-    doc.setTextColor(30,41,59); y += 20;
-    if (m.photo) { try { doc.addImage(m.photo, 'JPEG', margin, y, Math.min(contentW,300), 200); y += 210; } catch(e) {} }
-    addFooter(lang);
-  }
-
-  if (markers.length > 0) {
-    doc.addPage();
-    doc.setFillColor(15,31,61); doc.rect(0,0,W,40,'F');
-    doc.setFillColor(29,184,126); doc.rect(0,40,W,3,'F');
-    doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text(`${strings.en.pdf_quick_ref}  /  ${strings.es.pdf_quick_ref}`, margin, 26);
-    doc.setTextColor(30,41,59); doc.setFont('helvetica','normal');
-    let y = 60; doc.setFontSize(10);
-    for (let i = 0; i < markers.length; i++) {
-      const m = markers[i];
-      if (y > H-80) { addFooter(lang); doc.addPage(); y = margin; }
-      doc.setFont('helvetica','bold'); doc.text(`#${i+1}`, margin, y);
-      doc.setFont('helvetica','normal');
-      doc.text((m.desc||'').slice(0,80), margin+24, y); y += 14;
-      doc.setTextColor(100,116,139); doc.text(`   ${m.lat.toFixed(5)}, ${m.lng.toFixed(5)}`, margin, y);
-      doc.setTextColor(30,41,59); y += 18;
-    }
-    addFooter(lang);
+  // Footers on every page, with correct page numbers
+  const total = doc.getNumberOfPages();
+  for (let p = 1; p <= total; p++) {
+    doc.setPage(p);
+    doc.setFontSize(9); doc.setTextColor(150,150,150); doc.setFont('helvetica','normal');
+    doc.text(strings[p === 2 ? 'es' : 'en'].pdf_footer, margin, H-24);
+    doc.text(`${p} / ${total}`, W-margin, H-24, { align:'right' });
   }
 
   const safeCity = city.replace(/[^a-z0-9]/gi,'-').toLowerCase();
